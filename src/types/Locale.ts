@@ -7,7 +7,7 @@ export enum Locale {
   ES = 'es',
   MX = 'mx',
   CO = 'co',
-  UA = 'ua',
+  // UA = 'ua',
   PL = 'pl',
   PT = 'pt',
   GR = 'gr',
@@ -30,7 +30,7 @@ export enum Locale {
 }
 
 export const LANGUAGE_MAPPING = {
-  [Locale.RU]: [Locale.BY, Locale.UA, Locale.KZ, Locale.TJ, Locale.UZ, Locale.RU],
+  [Locale.RU]: [Locale.BY, Locale.KZ, Locale.TJ, Locale.UZ, Locale.RU],
   [Locale.ES]: [Locale.CO, Locale.MX, Locale.ES],
   [Locale.GR]: [Locale.CY, Locale.GR],
   [Locale.US]: [Locale.US, Locale.GB, Locale.AU, Locale.NG, Locale.KE, Locale.IE, Locale.UG, Locale.GH, Locale.CA],

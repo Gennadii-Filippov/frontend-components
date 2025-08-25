@@ -3,12 +3,18 @@
     <div class="checkbox-container">
       <input
         :id="id"
-        :class="[checkboxClass, { 'icon icon-check input-checkbox': true, 'input-checkbox--error': errors.length }]"
+        :class="[
+          checkboxClass,
+          {
+            'icon icon-check input-checkbox': true,
+            'input-checkbox--error': errors.length,
+          },
+        ]"
         type="checkbox"
-        :checked="modelValue"
+        :checked="!!props.modelValue"
         @change="handleChange"
-        @blur="onBlur"
-        @focus="onFocus"
+        @blur="props.onBlur"
+        @focus="props.onFocus"
       />
       <label v-if="labelHtml" :for="id" :class="[labelClass, 'checkbox-label']" v-html="labelHtml" />
     </div>
@@ -22,37 +28,42 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(
-  defineProps<{
-    onBlur?: () => void;
-    onFocus?: () => void;
-    checkboxClass?: string;
-    labelHtml?: string;
-    labelClass?: string;
-    id: string;
-    errors?: string[];
-  }>(),
-  {
-    onBlur: () => null,
-    onFocus: () => null,
-    checkboxClass: '',
-    labelHtml: '',
-    labelClass: '',
-    errors: () => [],
-  }
-);
+import { toRefs } from 'vue';
 
-const model = defineModel({ required: true, type: Boolean });
+interface Props {
+  onBlur?: () => void;
+  onFocus?: () => void;
+  checkboxClass?: string;
+  labelHtml?: string;
+  labelClass?: string;
+  id: string;
+  errors?: string[];
+  modelValue?: string | boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  onBlur: () => null,
+  onFocus: () => null,
+  checkboxClass: '',
+  labelHtml: '',
+  labelClass: '',
+  errors: () => [],
+  modelValue: false,
+});
+
+const { modelValue, onBlur, onFocus, checkboxClass, labelHtml, labelClass, id, errors } = toRefs(props);
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean];
+}>();
+
 function handleChange(event: Event) {
   const target = event.target as HTMLInputElement;
-  model.value = target.checked;
+  emit('update:modelValue', target.checked);
 }
 </script>
 
 <style scoped lang="scss">
-//TODO: disable, blocked возможно нужно будет добавить
-@use '@/scss/settings' as *;
-
 .checkbox-container {
   display: flex;
   gap: rem(8px);

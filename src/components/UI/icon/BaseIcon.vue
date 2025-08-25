@@ -9,7 +9,7 @@ import { computed } from 'vue';
 const props = withDefaults(
   defineProps<{
     tagName?: string;
-    size?: string;
+    size?: string | number;
     iconName: IconNames;
     textColor: string;
     fontSize?: string;

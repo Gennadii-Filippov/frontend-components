@@ -40,4 +40,11 @@ export default defineConfig({
     setupFiles: './tests/setup.ts',
     include: ['tests/**/*.{test,spec}.{ts,js}'],
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use "@/scss/settings" as *;`,
+      },
+    },
+  },
 });

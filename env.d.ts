@@ -6,19 +6,16 @@ declare module '*.vue' {
   export default component;
 }
 
-// Отключаем JSX проверки для Vue шаблонов
+// Global window interface
 declare global {
+  interface Window {
+    siteLocale: import('./src/types/Locale').Locale;
+    isReCapthcaEnabled: boolean;
+  }
+
   namespace JSX {
     interface IntrinsicElements {
       [elem: string]: any;
     }
-    interface Element extends Vue.VNode {}
-    interface ElementClass extends Vue.ComponentPublicInstance {}
-    interface ElementAttributesProperty {
-      $props: {};
-    }
   }
 }
-
-// Импортируем Vue для глобального использования
-import type * as Vue from 'vue';

@@ -13,7 +13,8 @@
         <span v-else-if="user.username">{{ user.username.slice(0, 2).toUpperCase() }}</span>
       </span>
     </div>
-    <a v-else class="signin button" href="#_login">{{ _(Lang.Login) }}</a>
+    <!--tslint:disable-next-line: no-increment-decrement -->
+    <a v-else class="signin button" href="#" @click="handleLoginClick">{{ _(Lang.Login) }}</a>
     <div
       :class="['icon', isMenuOpen ? 'icon-close' : 'icon-hamburger']"
       @click="openMenu"
@@ -30,13 +31,19 @@ import { asset } from '../utils';
 import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
+import useModal from '@/composables/useModal';
+const { open } = useModal({ name: 'auth' });
+
+const handleLoginClick = (event: MouseEvent) => {
+  event.preventDefault();
+  open();
+};
 
 defineProps<{
   isMenuOpen: boolean;
-  user?: User;
-  closeMenu: () => void;
   openMenu: () => void;
   openProfile: () => void;
+  user: any;
 }>();
 </script>
 
