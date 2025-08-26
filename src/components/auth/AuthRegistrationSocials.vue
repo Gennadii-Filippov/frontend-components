@@ -118,6 +118,7 @@ const props = defineProps<{
   removeErrorText: () => void;
   addErrorText: (messageClass: string, text: string) => void;
 }>();
+
 onMounted(() => {
   window.addEventListener(WebEvent.Message, (event) => {
     if (
@@ -128,15 +129,15 @@ onMounted(() => {
     }
 
     if (event.data && !event.data.from_auth) {
-      close('auth');
+      // close('auth');
       return;
     }
 
-    windowAuth.close();
+    // windowAuth.close();
 
     if (event.data) {
-      closeAll();
-      close('auth');
+      // closeAll();
+      // close('auth');
       event.data.popupType = PopupType.SocialMediaRegister;
       open({ name: PopupType.SocialMediaRegister, options: event.data });
     }

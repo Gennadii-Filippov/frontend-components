@@ -98,13 +98,13 @@ function performSpin() {
 
   // calculate offset
   let offset = 0;
-  if (window.innerWidth > WHEEL_PARAMS.maxMobileWidth) {
+  if (window?.innerWidth > WHEEL_PARAMS.maxMobileWidth) {
     const cardHeight = (ul.children[0] as HTMLElement).offsetHeight;
     offset = cardHeight * (randomIndex - 2) + randomIndex * WHEEL_PARAMS.itemMargin + cardHeight / 2;
     wheelPosition.value.top = -offset;
   } else {
     const cardWidth = (ul.children[0] as HTMLElement).offsetWidth;
-    offset = cardWidth * randomIndex + randomIndex * WHEEL_PARAMS.itemMargin - window.innerWidth / 2 + cardWidth / 2;
+    offset = cardWidth * randomIndex + randomIndex * WHEEL_PARAMS.itemMargin - window?.innerWidth / 2 + cardWidth / 2;
     wheelPosition.value.left = -offset;
   }
 

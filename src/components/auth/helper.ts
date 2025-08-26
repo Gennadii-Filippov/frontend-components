@@ -1,6 +1,19 @@
 import { RequestType } from '@/types/RequestType';
 import useModal from '@/composables/useModal';
 import { RouteName } from '@/types/RouteName';
+
+// Simple route function - replace with actual routing implementation
+const route = (name: RouteName, params?: Record<string, any>): string => {
+  // This is a placeholder implementation
+  // In a real application, this would generate URLs based on the route name and parameters
+  const routes: Record<RouteName, string> = {
+    [RouteName.FosUserSecurityCheck]: '/login_check',
+    [RouteName.FosUserSecurityRegister]: '/register',
+    // Add other routes as needed
+  } as Record<RouteName, string>;
+
+  return routes[name] || `/${name}`;
+};
 import { JsonObject } from '@/types/JsonValue';
 import type { UseFormWithValidation } from '../../composables/formValidation/types';
 import { Ref } from 'vue';
@@ -37,43 +50,7 @@ const localeCategoryMap: Record<LocaleCategory, Locales[]> = {
   [LocaleCategory.CookiePolicySecond]: [Locales.BR, Locales.DK, Locales.SE],
   [LocaleCategory.Base]: [],
 };
-export const sendAuthForm = async <T extends Record<string, any>>(
-  sendForm: UseFormWithValidation<T>['sendForm'],
-  form: UseFormWithValidation<T>['form'],
-  isLoading: Ref<boolean>,
-  successLogIn: Ref<boolean>
-) => {
-  await sendForm({
-    beforeSend: async (formData: FormData) => {
-      isLoading.value = true;
-      form.values._remember_me ? formData.set('_remember_me', '1') : formData.delete('_remember_me'); // на проде 1 и ничего вместо true false
-    },
-    send: async (formData: FormData): Promise<JsonObject | null> => {
-      return await new Promise<JsonObject>((resolve) => {
-        // $.ajax({
-        //   type: RequestType.Post,
-        //   url: route(RouteName.FosUserSecurityCheck),
-        //   data: formData,
-        //   success: (res) => {
-        //     const json = res as JsonObject;
-        //     if (json.error) {
-        //       isLoading.value = false;
-        //     }
-        //     if (json.success) {
-        //       successLogIn.value = true;
-        //       location.reload();
-        //     }
-        //     resolve(json);
-        //     return true;
-        //   },
-        //   error: () => {
-        //     isLoading.value = false;
-        //   },
-        // });
-      });
-    },
-  });
-};
+
 export const sendRegisterForm = async <T extends Record<string, any>>(
   sendForm: UseFormWithValidation<T>['sendForm'],
   form: UseFormWithValidation<T>['form'],
@@ -115,38 +92,36 @@ export const sendRegisterForm = async <T extends Record<string, any>>(
       form.values.rules ? formData.set('rules', '1') : formData.delete('rules');
     },
     send: async (formData: FormData): Promise<JsonObject | null> => {
-      return await new Promise<JsonObject>((resolve) => {
-        // $.ajax({
-        //   type: RequestType.Post,
-        //   url: route(RouteName.FosUserSecurityRegister),
-        //   data: formData,
-        //   success: (res) => {
-        //     const json = <JsonObject>res;
-        //     if (json?.status == ResponseStatus.Success) {
-        //       if (json.html && typeof json.html === 'string') {
-        //         useModal.open({
-        //           name: PopupType.RegisterSuccess,
-        //           data: {
-        //             username: form.values[
-        //               'fos_user_registration_form[username]'
-        //             ] as string,
-        //             email: form.values[
-        //               'fos_user_registration_form[email]'
-        //             ] as string,
-        //           },
-        //         });
-        //       } else {
-        //         useModal.close({ name: 'auth' });
-        //       }
-        //     }
-        //     resolve(json);
-        //     return true;
-        //   },
-        //   complete() {
-        //     loggingIn.value = false;
-        //   },
-        // });
-      });
+      try {
+        const response = await fetch(route(RouteName.FosUserSecurityRegister), {
+          method: RequestType.Post,
+          body: formData,
+        });
+
+        const json = (await response.json()) as JsonObject;
+
+        if (json?.status == ResponseStatus.Success) {
+          if (json.html && typeof json.html === 'string') {
+            const modal = useModal({ name: PopupType.RegisterSuccess });
+            modal.open({
+              name: PopupType.RegisterSuccess,
+              options: {
+                username: form.values['fos_user_registration_form[username]'] as string,
+                email: form.values['fos_user_registration_form[email]'] as string,
+              },
+            });
+          } else {
+            const modal = useModal({ name: 'auth' });
+            modal.close('auth');
+          }
+        }
+
+        return json;
+      } catch (error) {
+        throw error;
+      } finally {
+        loggingIn.value = false;
+      }
     },
   });
 };
@@ -353,5 +328,5 @@ export const noteTypeContent: Record<LoginPopupNoteTypeEnum, Lang> = {
 };
 
 export function calcPopupViewType() {
-  return window.innerWidth <= ScreenSize.MD ? PopupView.Fullscreen : PopupView.Auto;
+  return window?.innerWidth <= ScreenSize.MD ? PopupView.Fullscreen : PopupView.Auto;
 }

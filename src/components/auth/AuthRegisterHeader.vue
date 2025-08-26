@@ -26,6 +26,7 @@ const _ = inject(TRANSLATION_KEY, (key: string) => key);
 const emit = defineEmits<{
   (e: 'setTab', value: Tabs): void;
 }>();
+
 defineProps<{
   activeTab: Tabs;
 }>();

@@ -105,14 +105,14 @@
     <!--      />-->
     <!--      <span class="agree-error__text"> {{ _(Lang.YouMustAgreeToTheTerms) }}</span>-->
     <!--    </div>-->
-    <input type="hidden" :value="isLogin" name="visible-first" />
+    <input type="hidden" :value="props?.isLogin" name="visible-first" />
     <BaseButton
       data-goal-click="registration-button"
       type="submit"
       height="48px"
       width="100%"
       :button-type="ButtonType.Blue"
-      :class="['auth-popup__submit-btn', { 'mt-0 mb-3': isLogin }]"
+      :class="['auth-popup__submit-btn', { 'mt-0 mb-3': props?.isLogin }]"
       :disabled="loggingIn"
     >
       {{ _(Lang.Register) }}

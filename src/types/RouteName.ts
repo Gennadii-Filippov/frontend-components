@@ -170,4 +170,6 @@ export enum RouteName {
   IntellGetTipsByMeetings = 'intell_get_tips_by_meetings',
   IntellMeetingCompilation = 'intell_meeting_compilation',
   UserLeaderboard = 'intell.user_leaderboard',
+  FosUserSecurityCheck = 'fos_user_security_check',
+  FosUserSecurityRegister = 'fos_user_registration_register',
 }

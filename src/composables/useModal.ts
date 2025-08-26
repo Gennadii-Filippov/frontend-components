@@ -22,19 +22,37 @@ interface UseModalParams {
   stretch?: boolean;
   style?: ModalStyles;
   overflow?: boolean;
+  options?: ModalOptions;
 }
 
 const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, overflow = true }: UseModalParams) => {
   const instance = getCurrentInstance();
+
   const key = (name ?? instance?.uid ?? 'default') as string | number;
 
   const bodyOverflowHidden = ref(false);
 
-  const open = ({ name, options = {} }: { name?: string | number; options?: ModalOptions } = {}) => {
+  const open = (
+    arg?: { name?: string | number | null; options?: ModalOptions } | string | number | null,
+    maybeOptions?: ModalOptions
+  ) => {
     const isMobile = window?.matchMedia('(max-width: 450px)');
     const len = Object.keys(modalsList.value).length;
     try {
-      modalsList.value[name ?? key] = {
+      let targetName: string | number | null | undefined;
+      let options: ModalOptions = {};
+
+      if (typeof arg === 'string' || typeof arg === 'number' || arg === null) {
+        targetName = arg as string | number | null;
+        options = maybeOptions ?? {};
+      } else {
+        targetName = arg?.name;
+        options = arg?.options ?? {};
+      }
+
+      const k = (targetName ?? key) as string | number;
+
+      modalsList.value[k] = {
         open: true,
         stretch,
         styles: { zIndex: len ? len * 100 : 100, ...style },
@@ -91,9 +109,25 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
     }
   };
 
-  const toggle = ({ name, options = {} }: { name?: string | number; options?: ModalOptions } = {}) => {
+  const toggle = (
+    arg?: { name?: string | number | null; options?: ModalOptions } | string | number | null,
+    maybeOptions?: ModalOptions
+  ) => {
     try {
-      modalsList.value[name ?? key] = modalsList.value[name ?? key]?.open
+      let targetName: string | number | null | undefined;
+      let options: ModalOptions = {};
+
+      if (typeof arg === 'string' || typeof arg === 'number' || arg === null) {
+        targetName = arg as string | number | null;
+        options = maybeOptions ?? {};
+      } else {
+        targetName = arg?.name;
+        options = arg?.options ?? {};
+      }
+
+      const k = (targetName ?? key) as string | number;
+
+      modalsList.value[k] = modalsList.value[k]?.open
         ? null
         : {
             open: true,
@@ -154,6 +188,25 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
     }
   });
 
+  const setOptions = (options: ModalOptions) => {
+    try {
+      const existing = modalsList.value[key] ?? undefined;
+      const isMobile = window?.matchMedia('(max-width: 450px)');
+      const len = Object.keys(modalsList.value).length;
+
+      modalsList.value[key] = {
+        open: existing?.open ?? false,
+        stretch: existing?.stretch ?? stretch,
+        styles: existing?.styles ?? { zIndex: len ? len * 100 : 100, ...style },
+        isMobile: existing?.isMobile ?? isMobile,
+        order: existing?.order,
+        options: { ...(existing?.options ?? {}), ...(options ?? {}) },
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const closeAll = () => {
     try {
       modalsList.value = {};
@@ -163,15 +216,16 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
   };
 
   return {
-    closeAll,
     styles,
     modalsList,
     isOpen: isOpen,
+    currentModal,
+    closeAll,
     close,
     open,
     toggle,
     overflowToggle,
-    currentModal,
+    setOptions,
   };
 };
 

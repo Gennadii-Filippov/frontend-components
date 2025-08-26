@@ -7,21 +7,6 @@
       <div :class="['auth-block', messageClass]" v-if="socialErrorText">
         {{ socialErrorText }}
       </div>
-      <!--      <div v-if="loggingIn" class="auth-block auth-block&#45;&#45;green">{{ t(Lang.LoggingIn) }}</div>-->
-      <!--        TODO: актуально ли app.session.flashBag.get ?-->
-      <!--        {% for flash_message in app.session.flashBag.get('registration_confirmed') %}-->
-      <!--        <div class="error-text c-green block-section">{{ flash_message }}</div>-->
-      <!--        {% endfor %}-->
-      <!--        {% for flash_message in app.session.flashBag.get('registration_error') %}-->
-      <!--        <div class="error-text c-red block-section">{{ flash_message }}</div>-->
-      <!--        {% endfor %}-->
-      <!--    TODO: токены предположительно нерабочие-->
-      <!--      <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')  }}" />-->
-      <!--      {% if app.request.get('_route') != app.request.headers.get('referer') %}-->
-      <!--      {# <input type="hidden" name="_target_path" value="{{ app.request.headers.get('referer') }}" не работает на тесте /> #}-->
-      <!--      <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />-->
-      <!--      {% endif %}-->
-      <!--        TODO: path("fos_user_security_check") - предварительно сделано-->
       <BaseInput
         id="username"
         :autocomplete="'username'"
@@ -52,7 +37,7 @@
         box-height="0.75rem"
         box-width="0.75rem"
       />
-      <base-button
+      <BaseButton
         type="submit"
         height="48px"
         width="100%"
@@ -63,7 +48,7 @@
         {{ _(Lang.LogIn) }}
         <!--        Это заготовка для нового дизайна-->
         <!--        <span class="auth-popup__submit-btn__points" v-if="loggingIn">{{ points }}</span>-->
-      </base-button>
+      </BaseButton>
     </form>
 
     <div class="forgot-password link" @click="open({ name: PopupType.RecoverPassword })">
@@ -72,6 +57,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { RouteName } from '@/types/RouteName';
+import { RequestType } from '@/types/RequestType';
 import { Lang } from '@/types/Lang';
 import { InputType } from '@/components/UI/inputs/types';
 import BaseButton from '@/components/UI/button/BaseButton.vue';
@@ -80,15 +67,18 @@ import BaseCheckbox from '@/components/UI/checkbox/BaseCheckbox.vue';
 import { ValidationRules } from '@/composables/formValidation/types';
 import { PopupParams, PopupType } from '@/types/Popup';
 import { inject } from 'vue';
-import { TRANSLATION_KEY } from '@/types/injection-keys';
+import { JsonObject } from '@/types/JsonValue';
+import { TRANSLATION_KEY, ROUTE_KEY } from '@/types/injection-keys';
 import { useFormWithValidation } from '@/composables/formValidation/useFormWithValidation';
 import { ref } from 'vue';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
 const { open, currentModal } = useModal({ name: 'auth' });
 
+const isSuccessLogIn = ref(false);
+const isLoading = ref(false);
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
-
+const route = inject(ROUTE_KEY, (key: string) => key);
 withDefaults(
   defineProps<{
     messageClass: string;
@@ -127,11 +117,14 @@ const { form, validateField, setInFocusValue, errorsToShow, sendForm } = useForm
     rules: [],
   },
 ]);
-const isSuccessLogIn = ref(false);
-const isLoading = ref(false);
+
 const send = async () => {
-  const params = currentModal?.value?.options as PopupParams[PopupType.Auth];
-  await params.sendAuthForm(sendForm, form, isLoading, isSuccessLogIn);
+  try {
+    await currentModal?.value?.options?.sendAuthForm(sendForm, form, isLoading, isSuccessLogIn);
+  } catch (error) {
+    console.error(error);
+    isLoading.value = false;
+  }
 };
 </script>
 

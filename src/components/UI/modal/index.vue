@@ -1,46 +1,48 @@
 <template>
   <div ref="modal" v-if="isOpen" :class="{ 'lb-popup-background': true, shadow: props.shadow }">
-    <Transition name="fade">
-      <div
-        ref="popupWrapper"
-        :class="['base-popup__wrap', { 'base-popup__wrap--mobile': isMobileType }]"
-        @mousedown.self="closePopupEvent"
-      >
+    <Teleport to="body">
+      <Transition name="fade">
         <div
-          :class="[
-            'base-popup__inner',
-            {
-              'base-popup__inner--mobile': isMobileType,
-              'base-popup__inner--closed': isClosed,
-            },
-            className,
-          ]"
-          ref="popupInner"
-          :style="popupInnerStyles"
+          ref="popupWrapper"
+          :class="['base-popup__wrap', { 'base-popup__wrap--mobile': isMobileType }]"
+          @mousedown.self="closePopupEvent"
         >
           <div
-            ref="popupHeader"
-            :class="['base-popup__header', { 'border-bottom-active': headerBorderBottom }]"
-            :style="popupHeaderStyles"
+            :class="[
+              'base-popup__inner',
+              {
+                'base-popup__inner--mobile': isMobileType,
+                'base-popup__inner--closed': isClosed,
+              },
+              className,
+            ]"
+            ref="popupInner"
+            :style="popupInnerStyles"
           >
-            <div class="base-popup__header-inner">
-              <slot name="title" />
-              <div class="base-popup__close-btn icon icon-cross" @click="closePopupEvent"></div>
+            <div
+              ref="popupHeader"
+              :class="['base-popup__header', { 'border-bottom-active': headerBorderBottom }]"
+              :style="popupHeaderStyles"
+            >
+              <div class="base-popup__header-inner">
+                <slot name="title" />
+                <div class="base-popup__close-btn icon icon-cross" @click="closePopupEvent"></div>
+              </div>
+            </div>
+            <div
+              ref="popupContent"
+              :class="['base-popup__content', { 'base-popup__content--mobile': isMobileType }]"
+              :style="popupContentStyles"
+            >
+              <slot name="content" :close="closePopupEvent" />
+            </div>
+            <div ref="popupFooter" class="base-popup__footer">
+              <slot name="footer" :close="closePopupEvent" />
             </div>
           </div>
-          <div
-            ref="popupContent"
-            :class="['base-popup__content', { 'base-popup__content--mobile': isMobileType }]"
-            :style="popupContentStyles"
-          >
-            <slot name="content" :close="closePopupEvent" />
-          </div>
-          <div ref="popupFooter" class="base-popup__footer">
-            <slot name="footer" :close="closePopupEvent" />
-          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -88,8 +90,6 @@ const props = withDefaults(
   }
 );
 
-useTeleport(modal, props?.teleport);
-
 const { isOpen, close, styles } = useModal({
   ...props,
 });
@@ -110,25 +110,25 @@ const popupInnerStyles = computed(() => ({
 const popupContentStyles = computed(() => ({
   '--padding-top-content':
     props.paddingsContent?.top ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
   '--padding-bottom-content':
     props.paddingsContent?.bottom ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
   '--padding-right-content':
     props.paddingsContent?.right ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
   '--padding-left-content':
     props.paddingsContent?.left ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
 }));
 
 const popupHeaderStyles = computed(() => ({
   '--padding-header':
     props.paddingHeader ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobilePaddingValue : CONSTANTS.desktopPaddingValue),
   '--height-header':
     props.heightHeader ||
-    (window.innerWidth < ScreenSize.MD ? CONSTANTS.mobileHeaderHeight : CONSTANTS.desktopHeaderHeight),
+    (window?.innerWidth < ScreenSize.MD ? CONSTANTS.mobileHeaderHeight : CONSTANTS.desktopHeaderHeight),
 }));
 
 const isClosed = ref(false);
@@ -153,7 +153,7 @@ onMounted(() => {
     document.documentElement.style.scrollBehavior = 'auto';
     document.body.style.top = `-${scrollDistance}px`;
     document.body.classList.add('base-popup-in');
-    document.body.style.paddingRight = `${window.innerWidth - document.documentElement.clientWidth}px`;
+    document.body.style.paddingRight = `${window?.innerWidth - document.documentElement.clientWidth}px`;
   }
 
   setUpPopupElements();

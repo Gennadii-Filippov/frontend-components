@@ -11,6 +11,7 @@ export function useTeleport(
   onMounted(() => {
     if (isClient) {
       try {
+        console.error('teleportTarget', needTeleport, target.value);
         if (needTeleport && target.value) {
           document.body.appendChild(target.value);
           teleportTarget.value = target.value;

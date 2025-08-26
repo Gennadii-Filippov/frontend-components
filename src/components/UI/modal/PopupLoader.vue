@@ -1,5 +1,5 @@
 <template>
-  <div class="popup-loader" @click="close()">
+  <div class="popup-loader" @click="() => close()">
     <Loader size="25" />
   </div>
 </template>

@@ -2,13 +2,12 @@
   <ModalLoader v-if="loading && activeTab == Tabs.Registration" name="auth-loader" />
   <Modal
     name="auth"
-    class-name="auth-popup-inner"
-    v-else
+    className="auth-popup-inner"
     :width="375"
-    :header-border-bottom="false"
+    :headerBorderBottom="false"
     :viewType="popupViewType"
-    padding-header="16px"
-    :paddings-content="{
+    paddingHeader="16px"
+    :paddingsContent="{
       top: '24px',
       bottom: '24px',
       right: '16px',
@@ -16,11 +15,11 @@
     }"
   >
     <template #title>
-      <auth-register-header :activeTab="activeTab" @setTab="setTab" />
+      <AuthRegisterHeader :activeTab="activeTab" @setTab="setTab" />
     </template>
     <template #content>
       <div class="auth-popup__content">
-        <auth-registration-content
+        <AuthRegistrationContent
           :noteType="params?.noteType"
           :removeErrorText="removeErrorText"
           :addErrorText="addErrorText"
@@ -29,7 +28,7 @@
         <AuthForm v-if="activeTab == Tabs.Auth" :messageClass="messageClass" :socialErrorText="socialErrorText" />
         <RegistrationForm
           v-else
-          :isLogin="params.isLogin"
+          :isLogin="params?.isLogin"
           :messageClass="messageClass"
           :socialErrorText="socialErrorText"
           :token="regToken"
@@ -46,11 +45,7 @@ import AuthRegisterHeader from './AuthRegisterHeader.vue';
 import RegistrationForm from './RegistrationForm.vue';
 import { Tabs } from './types';
 import { onMounted, ref } from 'vue';
-
 import { PopupParams, PopupType } from '@/types/Popup';
-import { RequestType } from '@/types/RequestType';
-import { RouteName } from '@/types/RouteName';
-import { JsonObject } from '@/types/JsonValue';
 import ModalLoader from '@/components/UI/modal/PopupLoader.vue';
 import { WebEvent } from '@/types/WebEvent';
 import { calcPopupViewType } from '@/utils';
@@ -65,7 +60,7 @@ const route = inject('route', (key: string) => key);
 const loading = ref(false);
 
 const params = currentModal?.value?.options as PopupParams[PopupType.Auth];
-const activeTab = ref<Tabs>(!params ? Tabs.Auth : params.isLogin ? Tabs.Auth : Tabs.Registration);
+const activeTab = ref<Tabs>(!params ? Tabs.Auth : params?.isLogin ? Tabs.Auth : Tabs.Registration);
 const messageClass = ref('');
 const socialErrorText = ref('');
 const popupViewType = ref(calcPopupViewType());
@@ -86,30 +81,9 @@ function setTab(tab: Tabs) {
 }
 
 onMounted(() => {
-  // window.wa?.goal(window.wa?.createGoal('login-registration'));
   window.addEventListener(WebEvent.Resize, () => {
     popupViewType.value = calcPopupViewType();
   });
-
-  //TODO
-  // setIsLoading(true);
-  // $.ajax({
-  //   type: RequestType.Get,
-  //   url: route(RouteName.FormLogin, {
-  //     noteType: params.noteType,
-  //   }),
-  //   success: (res) => {
-  //     const json = res as JsonObject;
-  //     if (json?.token && typeof json.token == 'string') {
-  //       regToken.value = json?.token;
-  //       setIsLoading(false);
-  //     }
-  //     if (json?.note && typeof json.note == 'string') {
-  //       note.value = json?.note;
-  //     }
-  //     return true;
-  //   },
-  // });
 });
 </script>
 
