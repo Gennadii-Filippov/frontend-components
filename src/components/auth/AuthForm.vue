@@ -1,3 +1,103 @@
+<script setup lang="ts">
+import { Lang } from '@/types/Lang';
+import { InputType } from '@/components/UI/inputs/types';
+import BaseButton from '@/components/UI/button/BaseButton.vue';
+import BaseInput from '@/components/UI/inputs/BaseInput.vue';
+import BaseCheckbox from '@/components/UI/checkbox/BaseCheckbox.vue';
+import { ValidationRules } from '@/composables/formValidation/types';
+import { PopupType } from '@/types/Popup';
+import { inject } from 'vue';
+import { TRANSLATION_KEY } from '@/types/injection-keys';
+import { useFormWithValidation } from '@/composables/formValidation/useFormWithValidation';
+import { ref, onMounted } from 'vue';
+import { ButtonType } from '@/components/UI/button/ButtonTypes';
+import useModal from '@/composables/useModal';
+import useRecaptcha from '@/composables/useRecaptcha';
+const { open, currentModal } = useModal({ name: 'auth' });
+const { init, renderBadge, executeRecaptcha } = await useRecaptcha('ru');
+
+const isSuccessLogIn = ref(false);
+const recaptchaBadge = ref<HTMLElement | null>(null);
+const isLoading = ref(false);
+const _ = inject(TRANSLATION_KEY, (key: string) => key);
+withDefaults(
+  defineProps<{
+    messageClass: string;
+    socialErrorText: string;
+  }>(),
+  {
+    messageClass: '',
+    socialErrorText: '',
+  }
+);
+
+const { form, validateField, setInFocusValue, errorsToShow, sendForm } = useFormWithValidation([
+  {
+    name: '_csrf_token',
+    value: '',
+    rules: [],
+  },
+  {
+    name: '_target_path',
+    value: '',
+    rules: [],
+  },
+  {
+    name: '_username',
+    value: '',
+    rules: [
+      {
+        type: ValidationRules.Required,
+        message: _(Lang.EnterYourLogin),
+      },
+    ],
+  },
+  {
+    name: '_password',
+    value: '',
+    rules: [
+      {
+        type: ValidationRules.Required,
+        message: _(Lang.EnterThePassword),
+      },
+    ],
+  },
+  {
+    name: '_remember_me',
+    value: false,
+    rules: [],
+  },
+]);
+
+const send = async () => {
+  await sendForm({
+    beforeSend: async (formData) => {
+      const token = await executeRecaptcha('login_check');
+      if (!token) {
+        return;
+      }
+      // вместо true должна быть 1, а вместо false вовсе не должно быть, если как на проде делать
+      form.values._remember_me ? formData.append('_remember_me', '1') : null;
+      formData.append('captcha_token', token);
+    },
+    send: currentModal?.value?.options?.sendAuthForm,
+    afterSend: async (response) => {
+      //TODO получать данные о пользователе и обновлять интерфейс
+      console.log('response: ', response);
+      if (response.status === 'success') {
+        isSuccessLogIn.value = true;
+        // TODO: авторизация
+      }
+    },
+  });
+};
+
+onMounted(async () => {
+  if (recaptchaBadge.value) {
+    await init(() => renderBadge(recaptchaBadge.value as HTMLElement, 'login_check'));
+  }
+});
+</script>
 <template>
   <div>
     <div v-if="isSuccessLogIn" class="pb-6 c-green error-text">
@@ -50,84 +150,11 @@
         <!--        <span class="auth-popup__submit-btn__points" v-if="loggingIn">{{ points }}</span>-->
       </BaseButton>
     </form>
-
-    <div class="forgot-password link" @click="open({ name: PopupType.RecoverPassword })">
+    <div class="forgot-password link" @click="() => open({ name: PopupType.RecoverPassword })">
       {{ _(Lang.ForgotPassword) }}
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { RouteName } from '@/types/RouteName';
-import { RequestType } from '@/types/RequestType';
-import { Lang } from '@/types/Lang';
-import { InputType } from '@/components/UI/inputs/types';
-import BaseButton from '@/components/UI/button/BaseButton.vue';
-import BaseInput from '@/components/UI/inputs/BaseInput.vue';
-import BaseCheckbox from '@/components/UI/checkbox/BaseCheckbox.vue';
-import { ValidationRules } from '@/composables/formValidation/types';
-import { PopupParams, PopupType } from '@/types/Popup';
-import { inject } from 'vue';
-import { JsonObject } from '@/types/JsonValue';
-import { TRANSLATION_KEY, ROUTE_KEY } from '@/types/injection-keys';
-import { useFormWithValidation } from '@/composables/formValidation/useFormWithValidation';
-import { ref } from 'vue';
-import { ButtonType } from '@/components/UI/button/ButtonTypes';
-import useModal from '@/composables/useModal';
-const { open, currentModal } = useModal({ name: 'auth' });
-
-const isSuccessLogIn = ref(false);
-const isLoading = ref(false);
-const _ = inject(TRANSLATION_KEY, (key: string) => key);
-const route = inject(ROUTE_KEY, (key: string) => key);
-withDefaults(
-  defineProps<{
-    messageClass: string;
-    socialErrorText: string;
-  }>(),
-  {
-    messageClass: '',
-    socialErrorText: '',
-  }
-);
-const { form, validateField, setInFocusValue, errorsToShow, sendForm } = useFormWithValidation([
-  {
-    name: '_username',
-    value: '',
-    rules: [
-      {
-        type: ValidationRules.Required,
-        message: _(Lang.EnterYourLogin),
-      },
-    ],
-  },
-  {
-    name: '_password',
-    value: '',
-    rules: [
-      {
-        type: ValidationRules.Required,
-        message: _(Lang.EnterThePassword),
-      },
-    ],
-    defaultServerError: true,
-  },
-  {
-    name: '_remember_me',
-    value: true,
-    rules: [],
-  },
-]);
-
-const send = async () => {
-  try {
-    await currentModal?.value?.options?.sendAuthForm(sendForm, form, isLoading, isSuccessLogIn);
-  } catch (error) {
-    console.error(error);
-    isLoading.value = false;
-  }
-};
-</script>
-
 <style lang="scss">
 .auth-popup__checkbox {
   .checkbox-container {

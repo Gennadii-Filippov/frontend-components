@@ -208,6 +208,7 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
   };
 
   const closeAll = () => {
+    console.error('closeAll');
     try {
       modalsList.value = {};
     } catch (error) {
