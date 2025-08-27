@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { InputType } from './types';
 import { Lang } from '@/types/Lang';
-import BaseIcon from '@/components/UI/icon/BaseIcon.vue';
+import BaseIcon from '@/components/UI/icon/Icon.vue';
 import { IconNames } from '@/components/UI/icon/iconNames';
 
 interface Props {

@@ -2,12 +2,12 @@
 //src/Intell/UserBundle/Resources/views/Registration/register.html.twig
 import { Lang } from '@/types/Lang';
 import { InputType } from '@/components/UI/inputs/types';
-import BaseInput from '@/components/UI/inputs/BaseInput.vue';
+import BaseInput from '@/components/UI/inputs/Input.vue';
 import { Locale as Locales } from '@/types/Locale';
-import BaseButton from '@/components/UI/button/BaseButton.vue';
+import BaseButton from '@/components/UI/button/Button.vue';
 import { localeIn } from './checkLocale';
 import { computed, defineComponent, onMounted, ref, shallowRef } from 'vue';
-import BaseCheckbox from '@/components/UI/checkbox/BaseCheckbox.vue';
+import BaseCheckbox from '@/components/UI/checkbox/Checkbox.vue';
 import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
 import { useFormWithValidation } from '@/composables/formValidation/useFormWithValidation';
@@ -18,7 +18,7 @@ import useRecaptcha from '@/composables/useRecaptcha';
 import { PopupParams, PopupType } from '@/types/Popup';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
-const { currentModal } = useModal({ name: 'auth' });
+const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
 import { ValidationRule, ValidationRules } from '@/composables/formValidation/types';
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 const recaptchaBadge = ref<HTMLElement | null>(null);
@@ -86,8 +86,6 @@ const props = defineProps<{
   token: string;
 }>();
 
-const params = currentModal.value?.options as PopupParams[PopupType.Auth];
-
 const fields = [
   {
     name: 'fos_user_registration_form[_token]',
@@ -130,16 +128,16 @@ const fields = [
     value: false,
     rules: [],
   },
-  {
-    name: 'captcha_token',
-    value: '',
-    rules: [],
-  },
-  {
-    name: 'g-recaptcha-response',
-    value: '',
-    rules: [],
-  },
+  // {
+  //   name: 'captcha_token',
+  //   value: '',
+  //   rules: [],
+  // },
+  // {
+  //   name: 'g-recaptcha-response',
+  //   value: '',
+  //   rules: [],
+  // },
 ];
 if (localeIn([Locales.ES, Locales.GB, Locales.CZ, Locales.RS])) {
   fields.push({
@@ -151,22 +149,22 @@ if (localeIn([Locales.ES, Locales.GB, Locales.CZ, Locales.RS])) {
 const { form, setInFocusValue, errorsToShow, sendForm, validateField } = useFormWithValidation(fields);
 const loggingIn = ref(false);
 const send = async () => {
-  console.error('send');
   await sendForm({
     beforeSend: async (formData) => {
-      const token = await executeRecaptcha('register');
+      const token = await executeRecaptcha('register_check');
       if (!token) {
         return;
       }
       if (localeIn([Locales.ES, Locales.GB, Locales.CZ])) {
         formData.delete('agelimitname');
       }
+      console.error('token: ');
       // TODO: добавление капчи
-      formData.append('captcha_token', token);
-      formData.append('g-recaptcha-response', token);
+      // formData.append('captcha_token', token);
+      // formData.append('g-recaptcha-response', token);
     },
     // todo: заменить aboutPage
-    send: currentModal.value?.options?.sendRegisterForm,
+    send: currentModal.value?.options?.sendFeedbackForm,
     afterSend: async (response) => {
       if (response.status === 'success') {
         console.log(1);
@@ -183,7 +181,7 @@ const labelPolicy = computed(() => {
 });
 onMounted(async () => {
   if (recaptchaBadge.value) {
-    await init(() => renderBadge(recaptchaBadge.value as HTMLElement, 'register'));
+    await init(() => renderBadge(recaptchaBadge.value as HTMLElement, 'register_check'));
   }
 });
 </script>
@@ -308,7 +306,7 @@ onMounted(async () => {
       {{ _(Lang.Register) }}
     </BaseButton>
     <div class="register-form__grecaptcha" v-if="reCaptchaComponent">
-      <component :is="reCaptchaComponent" action="homepage" />
+      <div ref="recaptchaBadge" />
     </div>
   </form>
 </template>

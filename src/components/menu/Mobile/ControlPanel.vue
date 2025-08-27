@@ -32,11 +32,14 @@ import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 import useModal from '@/composables/useModal';
-const { open } = useModal({ name: 'auth' });
+const { open } = useModal({
+  name: 'auth',
+  closeOnDestroy: false,
+});
 
 const handleLoginClick = (event: MouseEvent) => {
   event.preventDefault();
-  open();
+  open({ name: 'auth' });
 };
 
 defineProps<{

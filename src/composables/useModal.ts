@@ -1,6 +1,5 @@
-import { ref, getCurrentInstance, onUnmounted, onBeforeUnmount, computed } from 'vue';
-import { PopupParams } from '@/types/Popup';
-import type { Ref, ComputedRef } from 'vue';
+import { ref, onBeforeUnmount, computed } from 'vue';
+import type { Ref } from 'vue';
 
 type ModalOptions = Record<string, any>;
 type ModalStyles = Record<string, any>;
@@ -11,7 +10,6 @@ type ModalState = {
   isMobile?: MediaQueryList | null;
   options?: ModalOptions;
   order?: number;
-  // params: PopupParams;
 };
 
 const modalsList: Ref<Record<string | number, ModalState | null>> = ref({});
@@ -26,9 +24,7 @@ interface UseModalParams {
 }
 
 const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, overflow = true }: UseModalParams) => {
-  const instance = getCurrentInstance();
-
-  const key = (name ?? instance?.uid ?? 'default') as string | number;
+  const key = name as string | number;
 
   const bodyOverflowHidden = ref(false);
 
@@ -140,17 +136,9 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
     }
   };
 
-  onUnmounted(() => {
-    try {
-      close();
-    } catch (error) {
-      console.error(error);
-    }
-  });
-
   onBeforeUnmount(() => {
     try {
-      if (closeOnDestroy) {
+      if (closeOnDestroy && key) {
         const pre: Record<string | number, ModalState | null> = {};
         Object.entries(modalsList.value).forEach(([k, value]) => {
           if (k !== String(key)) {
@@ -208,7 +196,6 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
   };
 
   const closeAll = () => {
-    console.error('closeAll');
     try {
       modalsList.value = {};
     } catch (error) {

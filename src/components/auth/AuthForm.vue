@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Lang } from '@/types/Lang';
 import { InputType } from '@/components/UI/inputs/types';
-import BaseButton from '@/components/UI/button/BaseButton.vue';
-import BaseInput from '@/components/UI/inputs/BaseInput.vue';
-import BaseCheckbox from '@/components/UI/checkbox/BaseCheckbox.vue';
+import BaseButton from '@/components/UI/button/Button.vue';
+import BaseInput from '@/components/UI/inputs/Input.vue';
+import BaseCheckbox from '@/components/UI/checkbox/Checkbox.vue';
 import { ValidationRules } from '@/composables/formValidation/types';
 import { PopupType } from '@/types/Popup';
 import { inject } from 'vue';
@@ -13,7 +13,10 @@ import { ref, onMounted } from 'vue';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
 import useRecaptcha from '@/composables/useRecaptcha';
-const { open, currentModal } = useModal({ name: 'auth' });
+const { open, currentModal } = useModal({
+  name: 'auth',
+  closeOnDestroy: false,
+});
 const { init, renderBadge, executeRecaptcha } = await useRecaptcha('ru');
 
 const isSuccessLogIn = ref(false);
@@ -192,5 +195,8 @@ onMounted(async () => {
   &--green {
     color: color(green);
   }
+}
+.input-box__input {
+  width: 100%;
 }
 </style>

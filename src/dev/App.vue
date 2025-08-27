@@ -19,20 +19,7 @@
   >
     <AuthPopup />
 
-    {#
-    <button
-      @click="
-        () =>
-          open(null, {
-            sendAuthForm: (...args: unknown[]) => {
-              console.log(args);
-            },
-          })
-      "
-    >
-      Open modal
-    </button>
-    #}
+    <button @click="() => open()">Open modal</button>
     <h1>Frontend Components Demo</h1>
     {{ modalsList }}
     <p>Below are a few components rendered from the library.</p>

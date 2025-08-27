@@ -19,14 +19,17 @@
 <script setup lang="ts">
 // TODO: SocialAuth.ts (data-url), (data-provider, data-goal-click - для nuxt)
 import { Locale as Locales } from '@/types/Locale';
-import BaseIcon from '@/components/UI/icon/BaseIcon.vue';
+import BaseIcon from '@/components/UI/icon/Icon.vue';
 import { IconNames } from '@/components/UI/icon/iconNames';
 import { localeIn, localeNotIn } from './checkLocale';
 import { ref, computed, onMounted } from 'vue';
 import { SocialIcon } from './types';
 import { PopupParams, PopupType } from '@/types/Popup';
 import useModal from '@/composables/useModal';
-const { currentModal, open, close, closeAll } = useModal({ name: 'auth' });
+const { currentModal, open, close, closeAll } = useModal({
+  name: 'auth',
+  closeOnDestroy: false,
+});
 
 import { WebEvent } from '@/types/WebEvent';
 

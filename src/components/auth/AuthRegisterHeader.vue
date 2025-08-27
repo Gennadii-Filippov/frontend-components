@@ -7,7 +7,6 @@
       {{ _(Lang.Login) }}
     </div>
     <div
-      data-goal-click="start-registration"
       :class="['reg-auth-popup__title', { 'reg-auth-popup__title--active': activeTab === Tabs.Registration }]"
       @click="emit('setTab', Tabs.Registration)"
     >

@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import AuthRegistrationSocials from './AuthRegistrationSocials.vue';
-import BaseIcon from '@/components/UI/icon/BaseIcon.vue';
+import BaseIcon from '@/components/UI/icon/Icon.vue';
 import { IconNames } from '@/components/UI/icon/iconNames';
 import { Locale as Locales } from '@/types/Locale';
 import { localeIn } from './checkLocale';

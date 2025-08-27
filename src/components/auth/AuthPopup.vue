@@ -1,5 +1,4 @@
 <template>
-  <ModalLoader v-if="loading && activeTab == Tabs.Registration" name="auth-loader" />
   <Modal
     name="auth"
     className="auth-popup-inner"
@@ -53,7 +52,7 @@ import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
 import useModal from '@/composables/useModal';
 
-const { currentModal } = useModal({ name: 'auth' });
+const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
 
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 const route = inject('route', (key: string) => key);
