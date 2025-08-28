@@ -42,7 +42,6 @@ export function useFormWithValidation<T extends Record<string, any>>(
       return false;
     }
     form.errors[field] = [];
-    form.errorForm = false;
     //Значение для чекбокса булево, а методы работают со строками
     const value =
       typeof form.values[field] === 'boolean' ? (!form.values[field] ? '' : 'true') : String(form.values[field]);
@@ -112,11 +111,6 @@ export function useFormWithValidation<T extends Record<string, any>>(
         case ValidationRules.isAnyFilled:
           //TODO
           break;
-        case ValidationRules.isLatinDigitsDot:
-          if (!isLatinDigitsDot(value)) {
-            form.errors[field].push(rule.message);
-          }
-          break;
       }
     });
     return !form.errors[field].length;
@@ -133,17 +127,38 @@ export function useFormWithValidation<T extends Record<string, any>>(
         isFormValid = false;
       }
     });
+
     return isFormValid;
   }
 
   function setInFocusValue(field: keyof T, value: boolean) {
     form.isInFocus[field] = value;
-    form.errorForm = false;
   }
 
   //TODO добавлять ошибки валидации с бэка, после сабмита
   function errorsToShow(field: keyof T) {
     return !form.isInFocus[field] ? form.errors[field] : [];
+  }
+
+  function showServerErrors(data: { error: string; message?: string; success: boolean }) {
+    // Отмечаем форму как ошибочную, чтобы, например, подсветить все поля
+    form.errorForm = true;
+
+    // Снимаем фокус со всех полей, чтобы ошибки отобразились
+    fields.forEach(({ name }) => {
+      form.isInFocus[name] = false;
+    });
+
+    // Выбираем поле для вывода серверной ошибки: помеченное defaultServerError или первое поле
+    const targetField = fields.find((f) => f.defaultServerError)?.name ?? (fields[0]?.name as keyof T | undefined);
+
+    if (targetField !== undefined) {
+      const message = data.error || data.message || 'Server error';
+      if (!Array.isArray(form.errors[targetField])) {
+        form.errors[targetField] = [] as string[];
+      }
+      form.errors[targetField].push(message);
+    }
   }
 
   async function sendForm(params: {
@@ -163,30 +178,21 @@ export function useFormWithValidation<T extends Record<string, any>>(
     });
 
     await beforeSend?.(formData);
+
     const data = await send(formData);
-    showServerErrors(data);
+
     await afterSend?.(data, formData);
 
     return data;
   }
-  function showServerErrors(data: ServerErrors) {
-    //нет единой системы на беке, поэтому вывел найденные кейсы
-    if (data && ((data.error && data.message) || (data.status && data.text))) {
-      if (data.field && data.text) {
-        const field2 = fields.find((el) => {
-          return data.field ? (el.name as string).includes(data.field) : false;
-        });
-        if (!field2) return;
-        form.errors[field2.name].push(data.text);
-        form.errorForm = true;
-      } else if (data.message) {
-        const field = fields.find((field) => field.defaultServerError);
-        if (!field) return;
-        form.errors[field.name].push(data.message);
-        form.errorForm = true;
-      }
-    }
-  }
 
-  return { form, validateForm, validateField, setInFocusValue, errorsToShow, sendForm, showServerErrors };
+  return {
+    form,
+    validateForm,
+    validateField,
+    setInFocusValue,
+    errorsToShow,
+    sendForm,
+    showServerErrors,
+  };
 }

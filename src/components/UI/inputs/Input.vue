@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { InputType } from './types';
-import { Lang } from '@/types/Lang';
 import BaseIcon from '@/components/UI/icon/Icon.vue';
 import { IconNames } from '@/components/UI/icon/iconNames';
 
@@ -125,8 +124,6 @@ const validationErrorAttributes = computed(() => {
   </div>
 </template>
 <style scoped lang="scss">
-// @use '@assets/sass/settings' as *;
-
 .input-box__container {
   padding-top: rem(8px);
   padding-bottom: rem(8px);

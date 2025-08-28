@@ -1,13 +1,17 @@
-export { useFormWithValidation } from './composables/formValidation/useFormWithValidation.ts';
 export { default as BaseButton } from './components/UI/button/Button.vue';
 export { ButtonType } from './components/UI/button/ButtonTypes.ts';
 export { default as BaseIcon } from './components/UI/icon/Icon.vue';
 export { default as BaseCheckbox } from './components/UI/checkbox/Checkbox.vue';
 export { default as Menu } from './components/menu/index.vue';
 export { default as Modal } from './components/UI/modal/index.vue';
-export { default as useModal } from './composables/useModal';
 export { default as BaseInput } from './components/UI/inputs/Input.vue';
 export { default as DropDown } from './components/UI/dropdown/DropDown.vue';
 export { default as Loader } from './components/UI/Loader.vue';
 export { default as AuthPopup } from './components/auth/AuthPopup.vue';
 export { default as useGlobal } from './composables/useGlobal';
+export { default as useModal } from './composables/useModal';
+export { useFormWithValidation } from './composables/formValidation/useFormWithValidation.ts';
+// export { useDevice } from './composables/useDevice';
+// export { createFrontendComponents } from './plugin';
+
+// export type { FrontendComponentsConfig, DeviceBreakpoints } from './config';
