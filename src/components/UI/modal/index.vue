@@ -147,7 +147,6 @@ onMounted(() => {
   if (window.visualViewport) {
     window.visualViewport.onresize = setPopupInnerHeight;
   }
-  document.body.style.overflow = 'hidden';
   //Предотвращаем скролл body
   if (props.isMobileType && Mobile.isMobile()) {
     document.documentElement.style.scrollBehavior = 'auto';

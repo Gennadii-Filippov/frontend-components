@@ -8,19 +8,3 @@ export function createFrontendComponents(options: FrontendComponentsConfig = {})
     },
   };
 }
-import { createFrontendComponents } from '@legalbet/frontend-components';
-
-const app = createApp(App);
-
-app.use(
-  createFrontendComponents({
-    deviceBreakpoints: {
-      mobileMax: 767,
-      tabletMin: 768,
-      tabletMax: 1279,
-      laptopMin: 1280,
-    },
-  })
-);
-
-app.mount('#app');

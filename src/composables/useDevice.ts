@@ -8,7 +8,6 @@ export const useDevice = () => {
       isTablet: false,
       isLaptop: true,
       screenHeight: 0,
-      isDesktop: false,
       screenWidth: 0,
       orientation: 'portrait' as 'portrait' | 'landscape',
       isLandscape: false,
@@ -70,14 +69,11 @@ export const useDevice = () => {
       }
     });
 
-    const setInitialDeviceType = (
-      type: 'isMobile' | 'isTablet' | 'isLaptop' | 'isDesktop' | 'isLandscape' | 'isPortrait'
-    ) => {
-      if (type === 'isMobile' || type === 'isTablet' || type === 'isLaptop' || type === 'isDesktop') {
+    const setInitialDeviceType = (type: 'isMobile' | 'isTablet' | 'isLaptop' | 'isLandscape' | 'isPortrait') => {
+      if (type === 'isMobile' || type === 'isTablet' || type === 'isLaptop') {
         deviceDimension.value.isMobile = false;
         deviceDimension.value.isTablet = false;
         deviceDimension.value.isLaptop = false;
-        deviceDimension.value.isDesktop = false;
         deviceDimension.value[type] = true;
         deviceDimension.value.currentDevice =
           type === 'isMobile' ? 'mobile' : type === 'isTablet' ? 'tablet' : type === 'isLaptop' ? 'laptop' : 'desktop';

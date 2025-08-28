@@ -21,36 +21,6 @@
 
     <button @click="() => open()">Open modal</button>
     <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
-    <h1>Frontend Components Demo</h1>
     {{ modalsList }}
     <p>Below are a few components rendered from the library.</p>
 

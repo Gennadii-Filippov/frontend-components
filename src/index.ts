@@ -11,7 +11,8 @@ export { default as AuthPopup } from './components/auth/AuthPopup.vue';
 export { default as useGlobal } from './composables/useGlobal';
 export { default as useModal } from './composables/useModal';
 export { useFormWithValidation } from './composables/formValidation/useFormWithValidation.ts';
-// export { useDevice } from './composables/useDevice';
-// export { createFrontendComponents } from './plugin';
+export { useDevice } from './composables/useDevice';
+export { createFrontendComponents } from './plugin';
+export { useClickOutside } from './composables/useClickOutside';
 
-// export type { FrontendComponentsConfig, DeviceBreakpoints } from './config';
+export type { FrontendComponentsConfig, DeviceBreakpoints } from './config';
