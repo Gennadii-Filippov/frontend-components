@@ -55,7 +55,7 @@ import useModal from '@/composables/useModal';
 const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
 
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
-const route = inject('route', (key: string) => key);
+// const route = inject('route', (key: string) => key);
 const loading = ref(false);
 
 const params = currentModal?.value?.options as PopupParams[PopupType.Auth];
@@ -87,7 +87,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
-// @use '@assets/sass/settings' as *;
 .auth-popup__checkbox-description {
   cursor: pointer;
 }
