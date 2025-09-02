@@ -3,14 +3,14 @@
     <div v-if="note" class="auth-popup__note">
       <div class="password-note">
         <div class="password-note__wrap">
-          <base-icon :icon-name="IconNames.CircleE" size="24px" font-size="24px" text-color="rgba(52, 152, 219, 1)" />
+          <BaseIcon :iconName="IconNames.CircleE" size="24px" font-size="24px" text-color="rgba(52, 152, 219, 1)" />
           <div class="password-note__txt" v-html="note" />
         </div>
       </div>
     </div>
     <!--            у регистрации и авторизации по какой-то причине vk перемещается, в остальном одинаково-->
     <!--            поэтому одна компонента (можно передать флажок для computed и настроить)-->
-    <auth-registration-socials :removeErrorText="removeErrorText" :addErrorText="addErrorText" />
+    <AuthRegistrationSocials :removeErrorText="removeErrorText" :addErrorText="addErrorText" />
     <div class="auth-popup__or">
       <div class="sign-in__line" />
       <div class="sign-in__txt">{{ _(Lang.Or) }}</div>

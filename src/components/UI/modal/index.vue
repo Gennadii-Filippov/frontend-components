@@ -52,10 +52,10 @@ import { computed, onBeforeUnmount, onMounted, ref, Transition } from 'vue';
 import PerfectScrollbar from 'perfect-scrollbar';
 import { ScreenSize } from '@/types/ScreenSize';
 import { WebEvent } from '@/types/WebEvent';
-import { Mobile } from '@/composables/useIsMobile';
+import { calcPopupViewType } from '@/utils';
 import { PopupView } from '@/types/Popup';
-import { useTeleport } from '@/composables/useTeleport';
-
+import { useDevice } from '@/composables/useDevice';
+const { isMobile } = useDevice();
 const modal = ref(null);
 const props = withDefaults(
   defineProps<{
@@ -77,7 +77,6 @@ const props = withDefaults(
       left: string;
     };
     heightHeader?: string;
-    teleport?: boolean;
   }>(),
   {
     width: 'auto',
@@ -86,9 +85,9 @@ const props = withDefaults(
     viewType: PopupView.FullHeightWithoutHeader,
     usePerfectScrollbar: true,
     shadow: true,
-    teleport: true,
   }
 );
+const viewType = ref(props.viewType);
 
 const { isOpen, close, styles } = useModal({
   ...props,
@@ -140,6 +139,10 @@ const popupInner = ref<HTMLElement | null>(null);
 //Нужна для предотвращения скролла боди
 let scrollDistance = 0;
 
+const handleResize = () => {
+  viewType.value = calcPopupViewType();
+};
+
 onMounted(() => {
   scrollDistance = window.scrollY;
   // Устанавливаем высоту модалки
@@ -148,11 +151,15 @@ onMounted(() => {
     window.visualViewport.onresize = setPopupInnerHeight;
   }
   //Предотвращаем скролл body
-  if (props.isMobileType && Mobile.isMobile()) {
+  if (props.isMobileType && isMobile.value) {
     document.documentElement.style.scrollBehavior = 'auto';
     document.body.style.top = `-${scrollDistance}px`;
     document.body.classList.add('base-popup-in');
     document.body.style.paddingRight = `${window?.innerWidth - document.documentElement.clientWidth}px`;
+    if (props?.viewType === PopupView.DinamicHeight) {
+      handleResize();
+      window.addEventListener(WebEvent.Resize, handleResize);
+    }
   }
 
   setUpPopupElements();
@@ -162,7 +169,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   //Возвращаем скролл боди
-  if (props.isMobileType && Mobile.isMobile()) {
+  if (props.isMobileType && isMobile.value) {
     document.body.classList.remove('base-popup-in');
     document.body.style.top = '';
     document.body.style.paddingRight = '0px';
@@ -174,6 +181,10 @@ onBeforeUnmount(() => {
 
   if (window.visualViewport) {
     window.visualViewport.onresize = null;
+  }
+
+  if (props?.viewType === PopupView.DinamicHeight) {
+    window.removeEventListener(WebEvent.Resize, handleResize);
   }
 });
 
@@ -217,7 +228,7 @@ function setPopupInnerHeight() {
   const kbOverlap = vv ? Math.max(0, window.innerHeight - vv.height - (vv.offsetTop || 0)) : 0;
   popupContent.value?.style.setProperty('--kb-overlap', `${kbOverlap}px`);
 
-  switch (props.viewType) {
+  switch (viewType.value) {
     case PopupView.Fullscreen:
       popupInner.value?.style.setProperty('--height', '100dvh');
       break;

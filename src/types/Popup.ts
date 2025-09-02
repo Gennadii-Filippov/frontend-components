@@ -12,6 +12,7 @@ export enum PopupView {
   FullHeightWithoutHeader = 'FullHeightWithoutHeader',
   Auto = 'auto',
   CustomHeight = 'customHeight',
+  DinamicHeight = 'dinamicHeight',
 }
 
 export enum BonusCardType {

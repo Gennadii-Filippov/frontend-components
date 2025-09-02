@@ -14,15 +14,14 @@ import { useFormWithValidation } from '@/composables/formValidation/useFormWithV
 import { allowedLocales, getLabelPolicy, idPath } from './helper';
 import { AgeLimitRules, RulesRules } from './registerRules';
 import useRecaptcha from '@/composables/useRecaptcha';
-
-import { PopupParams, PopupType } from '@/types/Popup';
+import { useConfig } from '@/composables/useConfig';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
 const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
 import { ValidationRule, ValidationRules } from '@/composables/formValidation/types';
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 const recaptchaBadge = ref<HTMLElement | null>(null);
-const { init, renderBadge, executeRecaptcha } = await useRecaptcha('ru');
+const { init, renderBadge, executeRecaptcha } = await useRecaptcha(useConfig().get('locale'));
 
 const PasswordFieldRules: ValidationRule[] = [
   {
@@ -78,7 +77,7 @@ const EmailFieldRules: ValidationRule[] = [
   },
 ];
 const reCaptchaComponent = shallowRef<ReturnType<typeof defineComponent> | null>(null);
-const locale = computed(() => window.siteLocale as Locales);
+const locale = useConfig().get('locale') as Locales;
 const props = defineProps<{
   isLogin?: boolean;
   messageClass: string;
@@ -177,7 +176,7 @@ const send = async () => {
 };
 const labelPolicy = computed(() => {
   //ts-ignore
-  return getLabelPolicy(locale.value);
+  return getLabelPolicy(locale);
 });
 onMounted(async () => {
   if (recaptchaBadge.value) {

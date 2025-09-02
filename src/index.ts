@@ -14,5 +14,7 @@ export { useFormWithValidation } from './composables/formValidation/useFormWithV
 export { useDevice } from './composables/useDevice';
 export { createFrontendComponents } from './plugin';
 export { useClickOutside } from './composables/useClickOutside';
+export { dynamicScriptLoader } from './composables/dynamicScriptLoader';
+export { useConfig } from './composables/useConfig';
 
 export type { FrontendComponentsConfig, DeviceBreakpoints } from './config';

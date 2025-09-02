@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { LegalEvent } from '@/types/LegalEvents';
-
+import { useConfig } from '@/composables/useConfig';
 import Logo from '@/assets/img/legalbet-logo.svg';
 import LogoWhite from '@/assets/img/legalbet-logo-white.svg';
 import { Locale } from '@/types/Locale';
@@ -45,7 +45,7 @@ const setScrollMenu = (e: Event) => {
 };
 
 onMounted(() => {
-  if ((window as any).siteLocale === Locale.KZ) {
+  if (useConfig().get('locale') === Locale.KZ) {
     altText.value = _(Lang.ManinLogoAltText);
   }
   document.addEventListener(LegalEvent.ScrollNewMenuEvent, setScrollMenu);

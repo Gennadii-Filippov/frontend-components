@@ -13,11 +13,13 @@ import { ref, onMounted } from 'vue';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
 import useRecaptcha from '@/composables/useRecaptcha';
+import { useConfig } from '@/composables/useConfig';
+
 const { open, currentModal } = useModal({
   name: 'auth',
   closeOnDestroy: false,
 });
-const { init, renderBadge, executeRecaptcha } = await useRecaptcha('ru');
+const { init, renderBadge, executeRecaptcha } = await useRecaptcha(useConfig().get('locale'));
 
 const isSuccessLogIn = ref(false);
 const recaptchaBadge = ref<HTMLElement | null>(null);
@@ -117,18 +119,18 @@ onMounted(async () => {
         :label="_(Lang.Username)"
         :type="InputType.Text"
         :class="['auth-popup__input', { 'input-box__container--error': form.errorForm }]"
-        :errors-form-with-validation="errorsToShow('_username')"
+        :errorsFormWithValidation="errorsToShow('_username')"
         @blur="validateField('_username')"
         @focus="setInFocusValue('_username', false)"
       />
       <BaseInput
         id="password"
-        :autocomplete="'current-password'"
+        autocomplete="current-password"
         v-model="form.values._password"
         :label="_(Lang.Password)"
         :type="InputType.Password"
         :class="['auth-popup__input', { 'input-box__container--error': form.errorForm }]"
-        :errors-form-with-validation="errorsToShow('_password')"
+        :errorsFormWithValidation="errorsToShow('_password')"
         @blur="validateField('_password')"
         @focus="setInFocusValue('_password', false)"
       />
@@ -137,7 +139,7 @@ onMounted(async () => {
         v-model="form.values._remember_me"
         class="auth-popup__checkbox auth-popup__checkbox--big-font 123"
         :label-html="_(Lang.RememberMe)"
-        box-height="0.75rem"
+        boxHeight="0.75rem"
         box-width="0.75rem"
       />
       <BaseButton

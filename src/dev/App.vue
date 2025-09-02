@@ -31,16 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { BaseButton, BaseCheckbox, BaseInput, ButtonType } from '@/index';
 import AuthPopup from '@/components/auth/AuthPopup.vue';
 import useModal from '@/composables/useModal';
 const { open, modalsList } = useModal({ name: 'auth' });
 const checked = ref(false);
 const text = ref('');
-onMounted(() => {
-  window.siteLocale = 'ru';
-});
 </script>
 
 <style scoped>
