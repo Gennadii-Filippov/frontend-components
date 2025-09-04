@@ -7,7 +7,6 @@ type ModalState = {
   open: boolean;
   stretch: boolean;
   styles?: ModalStyles;
-  isMobile?: MediaQueryList | null;
   options?: ModalOptions;
   order?: number;
 };
@@ -21,6 +20,7 @@ interface UseModalParams {
   style?: ModalStyles;
   overflow?: boolean;
   options?: ModalOptions;
+  forceCloseAll?: boolean;
 }
 
 const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, overflow = true }: UseModalParams) => {
@@ -29,10 +29,25 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
   const bodyOverflowHidden = ref(false);
 
   const open = (
-    arg?: { name?: string | number | null; options?: ModalOptions } | string | number | null,
+    arg?:
+      | {
+          name?: string | number | null;
+          options?: ModalOptions;
+          forceCloseAll?: boolean;
+        }
+      | string
+      | number
+      | null,
     maybeOptions?: ModalOptions
   ) => {
-    const isMobile = window?.matchMedia('(max-width: 450px)');
+    if (
+      arg &&
+      typeof arg === 'object' &&
+      'forceCloseAll' in arg &&
+      (arg as { forceCloseAll?: boolean }).forceCloseAll
+    ) {
+      closeAll();
+    }
     const len = Object.keys(modalsList.value).length;
     try {
       let targetName: string | number | null | undefined;
@@ -52,7 +67,6 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
         open: true,
         stretch,
         styles: { zIndex: len ? len * 100 : 100, ...style },
-        isMobile: isMobile,
         options,
       };
 
@@ -179,14 +193,12 @@ const useModal = ({ name, closeOnDestroy = true, stretch = false, style = {}, ov
   const setOptions = (options: ModalOptions) => {
     try {
       const existing = modalsList.value[key] ?? undefined;
-      const isMobile = window?.matchMedia('(max-width: 450px)');
       const len = Object.keys(modalsList.value).length;
 
       modalsList.value[key] = {
         open: existing?.open ?? false,
         stretch: existing?.stretch ?? stretch,
         styles: existing?.styles ?? { zIndex: len ? len * 100 : 100, ...style },
-        isMobile: existing?.isMobile ?? isMobile,
         order: existing?.order,
         options: { ...(existing?.options ?? {}), ...(options ?? {}) },
       };

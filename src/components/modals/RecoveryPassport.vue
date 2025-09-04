@@ -2,12 +2,10 @@
 import { ref, inject } from 'vue';
 import { PopupType } from '@/types/Popup';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
-import BaseInput from '@/components/UI/inputs/Input.vue';
 import { Lang } from '@/types/Lang';
 import PopupLoader from '@/components/UI/modal/PopupLoader.vue';
-import { Modal, useFormWithValidation } from '@/index';
-import useModal from '@/composables/useModal';
-import useGlobal from '@/composables/useGlobal';
+import { Modal, useFormWithValidation, useModal, BaseButton, useGlobal, BaseInput } from '@/index';
+import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import { ValidationRules } from '@/composables/formValidation/types';
 import { PopupView } from '@/types/Popup';
 
@@ -39,7 +37,7 @@ const { form, sendForm, errorsToShow, validateField, setInFocusValue } = useForm
   },
 ]);
 
-const { close } = useModal({ name: 'RecoveryPassport' });
+const { close, open } = useModal({ name: 'RecoveryPassport' });
 
 const send = async () => {
   await sendForm({
@@ -87,8 +85,16 @@ const send = async () => {
               />
             </div>
             <div class="reset-password-popup__button-container">
-              <BaseButton class="button blue" type="submit" :value="_(Lang.EmailResettingButton)" />
-              <BaseButton class="button-close" @click="close" :value="_(Lang.Cancel)" />
+              <BaseButton class="button blue" type="submit" :buttonType="ButtonType.Blue">
+                {{ _(Lang.EmailResettingButton) }}
+              </BaseButton>
+              <BaseButton
+                class="button-close"
+                @click="() => open({ name: 'auth', forceCloseAll: true })"
+                :buttonType="ButtonType.Close"
+              >
+                {{ _(Lang.Cancel) }}
+              </BaseButton>
             </div>
           </div>
         </form>
@@ -115,7 +121,7 @@ const send = async () => {
             </div>
           </div>
           <div class="block-section footer">
-            <BaseButton class="button blue" @click="close">
+            <BaseButton class="button blue" @click="() => close()" :buttonType="ButtonType.Blue">
               {{ _(Lang.Continue) }}
             </BaseButton>
           </div>
@@ -125,7 +131,6 @@ const send = async () => {
   </div>
 </template>
 <style scoped lang="scss">
-@use '@assets/sass/settings' as *;
 .base-popup__content {
   padding: rem(24px) rem(16px);
 }
@@ -390,7 +395,6 @@ const send = async () => {
 }
 </style>
 <style lang="scss">
-@use '@assets/sass/settings' as *;
 .reset-passport--popup {
   height: fit-content !important;
 }

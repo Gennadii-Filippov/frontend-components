@@ -8,4 +8,5 @@ export enum ButtonType {
   White = 'white',
   WhiteStroke = 'white-stroke',
   WhiteStrokeTransparency = 'white-stroke-transparency',
+  Close = 'close',
 }

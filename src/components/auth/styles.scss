@@ -1,0 +1,130 @@
+@use '../../scss/settings/index.scss' as *;
+
+.auth-popup__checkbox {
+  .checkbox-container {
+    gap: rem(12px);
+  }
+  margin-bottom: rem(40px);
+  .input-checkbox {
+    padding: 0;
+    min-height: rem(12px);
+  }
+  .checkbox-label {
+    font-size: rem(14px) !important;
+    line-height: rem(14px) !important;
+  }
+}
+.auth-popup__submit-btn {
+  margin-bottom: rem(24px);
+  font-weight: 600;
+  font-size: rem(16px);
+  line-height: rem(18px);
+  &__points {
+    position: absolute;
+    padding-left: rem(4px);
+  }
+}
+.forgot-password {
+  font-weight: 600;
+  font-size: rem(14px);
+  line-height: rem(16px);
+  width: 100%;
+  text-align: center;
+}
+.auth-block {
+  margin-bottom: rem(24px);
+  &--green {
+    color: color(green);
+  }
+}
+.input-box__input {
+  width: 100%;
+}
+
+.auth-popup__checkbox-description {
+  cursor: pointer;
+}
+
+.auth-popup__submit-btn {
+  margin-bottom: rem(24px);
+}
+.forgot-password {
+  font-weight: 600;
+  font-size: rem(14px);
+  line-height: rem(16px);
+  width: 100%;
+  text-align: center;
+}
+.auth-popup__content {
+  padding-top: rem(8px);
+  @media #{$md} {
+    padding-top: 0;
+  }
+}
+
+.reg-auth-popup__header {
+  display: flex;
+  gap: rem(12px);
+  height: 100%;
+}
+.reg-auth-popup__title {
+  cursor: pointer;
+  height: 100%;
+  font-weight: 600;
+  font-size: rem(14px);
+  display: flex;
+  align-items: center;
+  color: color(black-80);
+  user-select: none;
+
+  &--active {
+    color: color(blue);
+    position: relative;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      height: rem(1px);
+      background-color: color(blue);
+      bottom: -15px;
+    }
+  }
+}
+
+.password-note {
+  margin-bottom: rem(24px);
+  &__wrap {
+    padding: rem(16px);
+    display: flex;
+    gap: rem(12px);
+    border-radius: rem(8px);
+    border: rem(1px) solid color(blue);
+  }
+  &__txt {
+    font-weight: 400;
+    font-size: rem(14px);
+    line-height: rem(20px);
+  }
+}
+
+.auth-popup__or {
+  text-transform: lowercase;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: rem(24px);
+}
+.sign-in__line {
+  background-color: color(black-10);
+  height: rem(1px);
+  width: 100%;
+}
+.sign-in__txt {
+  text-align: center;
+  font-size: rem(12px);
+  font-weight: 400;
+  line-height: rem(14px);
+  color: color(black-40);
+  margin: 0 rem(12px);
+}

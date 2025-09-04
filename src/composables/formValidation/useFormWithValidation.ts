@@ -9,6 +9,7 @@ import {
   isPhone,
   isPositiveNumeric,
   isValidDate,
+  isEmailHard,
 } from './utils';
 import type { FieldConfig, UseFormWithValidation } from './types';
 import { ValidationRules } from './types';
@@ -92,6 +93,11 @@ export function useFormWithValidation<T extends Record<string, any>>(
           break;
         case ValidationRules.isMoreThanDate:
           if (!isMoreThanDate(value, rule.borderDate)) {
+            form.errors[field].push(rule.message);
+          }
+          break;
+        case ValidationRules.isEmailHard:
+          if (!isEmailHard(value)) {
             form.errors[field].push(rule.message);
           }
           break;

@@ -4,7 +4,7 @@
     className="auth-popup-inner"
     :width="375"
     :headerBorderBottom="false"
-    :viewType="popupViewType"
+    :viewType="PopupView.DinamicHeight"
     paddingHeader="16px"
     :paddingsContent="{
       top: '24px',
@@ -14,7 +14,25 @@
     }"
   >
     <template #title>
-      <AuthRegisterHeader :activeTab="activeTab" @setTab="setTab" />
+      <div class="reg-auth-popup__header">
+        <div
+          :class="['reg-auth-popup__title', { 'reg-auth-popup__title--active': activeTab === Tabs.Auth }]"
+          @click="setTab(Tabs.Auth)"
+        >
+          {{ _(Lang.Login) }}
+        </div>
+        <div
+          :class="[
+            'reg-auth-popup__title',
+            {
+              'reg-auth-popup__title--active': activeTab === Tabs.Registration,
+            },
+          ]"
+          @click="setTab(Tabs.Registration)"
+        >
+          {{ _(Lang.Registration) }}
+        </div>
+      </div>
     </template>
     <template #content>
       <div class="auth-popup__content">
@@ -37,31 +55,26 @@
   </Modal>
 </template>
 <script setup lang="ts">
-import Modal from '../UI/modal/index.vue';
 import AuthRegistrationContent from './AuthRegistrationContent.vue';
 import AuthForm from './AuthForm.vue';
-import AuthRegisterHeader from './AuthRegisterHeader.vue';
 import RegistrationForm from './RegistrationForm.vue';
 import { Tabs } from './types';
-import { onMounted, ref } from 'vue';
+import { Lang } from '@/types/Lang';
+import { ref } from 'vue';
 import { PopupParams, PopupType } from '@/types/Popup';
-import { WebEvent } from '@/types/WebEvent';
-import { calcPopupViewType } from '@/utils';
 import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
-import useModal from '@/composables/useModal';
+import { useModal, Modal } from '@/index';
+import { PopupView } from '@/types/Popup';
 
 const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
 
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
-// const route = inject('route', (key: string) => key);
-const loading = ref(false);
 
 const params = currentModal?.value?.options as PopupParams[PopupType.Auth];
 const activeTab = ref<Tabs>(!params ? Tabs.Auth : params?.isLogin ? Tabs.Auth : Tabs.Registration);
 const messageClass = ref('');
 const socialErrorText = ref('');
-const popupViewType = ref(calcPopupViewType());
 const regToken = ref('');
 const note = ref('');
 
@@ -77,33 +90,8 @@ function setTab(tab: Tabs) {
   removeErrorText();
   activeTab.value = tab;
 }
-
-onMounted(() => {
-  window.addEventListener(WebEvent.Resize, () => {
-    popupViewType.value = calcPopupViewType();
-  });
-});
 </script>
 
 <style lang="scss">
-.auth-popup__checkbox-description {
-  cursor: pointer;
-}
-
-.auth-popup__submit-btn {
-  margin-bottom: rem(24px);
-}
-.forgot-password {
-  font-weight: 600;
-  font-size: rem(14px);
-  line-height: rem(16px);
-  width: 100%;
-  text-align: center;
-}
-.auth-popup__content {
-  padding-top: rem(8px);
-  @media #{$md} {
-    padding-top: 0;
-  }
-}
+@use './styles.scss' as *;
 </style>

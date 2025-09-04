@@ -27,19 +27,20 @@
       <BaseCheckbox id="demo-check" v-model="checked" :labelHtml="'Accept terms'" />
       <BaseInput id="demo-input" v-model="text" label="Your text" placeholder="Type something" />
     </section>
+    <RecoveryPassport />
   </main>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { BaseButton, BaseCheckbox, BaseInput, ButtonType } from '@/index';
+import RecoveryPassport from '@/components/modals/RecoveryPassport.vue';
 import AuthPopup from '@/components/auth/AuthPopup.vue';
 import useModal from '@/composables/useModal';
-const { open, modalsList } = useModal({ name: 'auth' });
+const { open, modalsList } = useModal({ name: 'recoverPassword' });
 const checked = ref(false);
 const text = ref('');
 </script>
-
 <style scoped>
 :root {
   color-scheme: light dark;

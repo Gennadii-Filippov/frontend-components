@@ -6,6 +6,10 @@ export function isNumeric(value: string): boolean {
   return /^-?\d+(\.\d+)?$/.test(value);
 }
 
+export function isEmailHard(value: string): boolean {
+  return isEmail(value) && value.indexOf('+') < 0; //"+" not allowed
+}
+
 export function isOnlyLetters(value: string): boolean {
   return /^[a-zа-я-'\s]+$/i.test(value);
 }

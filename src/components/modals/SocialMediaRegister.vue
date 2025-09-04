@@ -1,5 +1,5 @@
 <template>
-  <PopupLoader v-if="loading" />
+  <PopupLoader v-if="loading" :name="PopupType.SocialMediaRegister" />
   <Modal
     v-else-if="!loading"
     ref="basePopupRef"
@@ -49,7 +49,7 @@
                   id="notice_bonus"
                   v-model="form.values.noticeBonus"
                   :labelHtml="_(Lang.GetMostInterestingFromSiteOnEmail)"
-                  @change="setInFocusValue('notice_bonus', false)"
+                  @change="setInFocusValue('noticeBonus', false)"
                 />
               </div>
               <div v-if="ageLocales.includes(locale)" class="social-register-popup__age-limit">
@@ -61,7 +61,7 @@
                   @change="setInFocusValue('ageLimit', false)"
                 />
               </div>
-              <div v-if="idPath[locale]" class="social-register-popup__rules">
+              <div v-if="idPathByLocale" class="social-register-popup__rules">
                 <div :class="checkboxConfig.class">
                   <BaseCheckbox
                     id="rules"
@@ -92,9 +92,9 @@ import { idPath } from '@/components/auth/helper';
 import { ref, computed } from 'vue';
 import { Modal } from '@/index';
 import { PopupParams, PopupType } from '@/types/Popup';
-import BaseInput from '../common/inputs/BaseInput.vue';
+import BaseInput from '@/components/UI/inputs/Input.vue';
 import { Lang } from '@/types/Lang';
-import PopupLoader from '../common/popups/PopupLoader.vue';
+import PopupLoader from '@/components/UI/modal/PopupLoader.vue';
 import { JsonObject } from '@/types/JsonValue';
 import { InputType } from '@/components/UI/inputs/types';
 import { useFormWithValidation, useConfig, BaseCheckbox, useModal } from '@/index';
@@ -115,11 +115,13 @@ type SocialMediaRegisterFields = {
 
 const props = defineProps<{
   back: (data: { uid: string; hash: string }) => void;
-  sendSocialRegisterRequest: (data: any) => void;
+  sendSocialRegisterRequest: (data: FormData) => Promise<JsonObject | null> | JsonObject | null;
 }>();
 
 const route = inject('route', (key: string) => key);
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
+// Some translations accept parameters (links). Provide a helper with a compatible signature.
+const __t = _ as unknown as (key: any, params?: any) => string;
 // TODO: переписать под общий вид - сначала будет в nuxt (assets/vue/components/popups/auth/helper.ts уже есть вариант реализации)
 const ageLocales = [Locale.ES, Locale.GB, Locale.CZ, Locale.RS];
 const sngLocales = ['ru', 'kk', 'by', 'tj'];
@@ -205,6 +207,11 @@ const { form, validateField, setInFocusValue, errorsToShow, sendForm, loading } 
 
 const locale = useConfig().get('locale') as Locale;
 
+// Safely resolve idPath for current locale (not all locales are present in IdPath type)
+const idPathByLocale = computed(() => (idPath as Partial<Record<Locale, any>>)[locale]);
+const getPath = (key: 'gdpr' | 'privacy_policy' | 'personal_data_policy' | 'cookie_policy') =>
+  (idPathByLocale.value as any)?.[key] ?? '';
+
 const error = ref<string | null>(null);
 
 function goBack(): void {
@@ -222,37 +229,37 @@ function goBack(): void {
 function setTextForCheckbox(typeText: string) {
   switch (typeText) {
     case 'SNG':
-      return __(Lang.ConfirmDataForSNG, [
-        `<a class="link" target="_blank" href="${route(idPath[locale]['gdpr'])}">`,
+      return __t(Lang.ConfirmDataForSNG, [
+        `<a class="link" target="_blank" href="${route(getPath('gdpr'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['privacy_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('privacy_policy'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['personal_data_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('personal_data_policy'))}">`,
         '</a>',
       ]);
     case 'cookie':
-      return __(Lang.IAcceptCookies, [
-        `<a class="link" target="_blank" href="${route(idPath[locale]['gdpr'])}">`,
+      return __t(Lang.IAcceptCookies, [
+        `<a class="link" target="_blank" href="${route(getPath('gdpr'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['privacy_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('privacy_policy'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['cookie_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('cookie_policy'))}">`,
         '</a>',
       ]);
     case 'cookie and age':
-      return __(Lang.ConfirmAgeCookie, [
-        `<a class="link" target="_blank" href="${route(idPath[locale]['gdpr'])}">`,
+      return __t(Lang.ConfirmAgeCookie, [
+        `<a class="link" target="_blank" href="${route(getPath('gdpr'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['privacy_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('privacy_policy'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['cookie_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('cookie_policy'))}">`,
         '</a>',
       ]);
     case 'another':
-      return __(Lang.IAcceptAfterRegister, [
-        `<a class="link" target="_blank" href="${route(idPath[locale]['gdpr'])}">`,
+      return __t(Lang.IAcceptAfterRegister, [
+        `<a class="link" target="_blank" href="${route(getPath('gdpr'))}">`,
         '</a>',
-        `<a class="link" target="_blank" href="${route(idPath[locale]['privacy_policy'])}">`,
+        `<a class="link" target="_blank" href="${route(getPath('privacy_policy'))}">`,
         '</a>',
       ]);
   }

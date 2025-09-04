@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import { Lang } from '@/types/Lang';
 import { InputType } from '@/components/UI/inputs/types';
-import BaseButton from '@/components/UI/button/Button.vue';
-import BaseInput from '@/components/UI/inputs/Input.vue';
-import BaseCheckbox from '@/components/UI/checkbox/Checkbox.vue';
 import { ValidationRules } from '@/composables/formValidation/types';
 import { PopupType } from '@/types/Popup';
-import { inject } from 'vue';
 import { TRANSLATION_KEY } from '@/types/injection-keys';
-import { useFormWithValidation } from '@/composables/formValidation/useFormWithValidation';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
-import useModal from '@/composables/useModal';
-import useRecaptcha from '@/composables/useRecaptcha';
-import { useConfig } from '@/composables/useConfig';
+import { useModal, useConfig, useRecaptcha, useFormWithValidation, BaseCheckbox, BaseInput, BaseButton } from '@/index';
 import Loader from '../UI/Loader.vue';
 
-const { open, currentModal } = useModal({
+const { open, currentModal, close } = useModal({
   name: 'auth',
   closeOnDestroy: false,
 });
@@ -106,6 +99,13 @@ onMounted(async () => {
     await init(() => renderBadge(recaptchaBadge.value as HTMLElement, 'login_check'));
   }
 });
+
+const openRecoveryPassword = () => {
+  open({ name: PopupType.RecoverPassword });
+  setTimeout(() => {
+    close();
+  }, 100);
+};
 </script>
 <template>
   <div>
@@ -147,7 +147,7 @@ onMounted(async () => {
         class="auth-popup__checkbox auth-popup__checkbox--big-font 123"
         :label-html="_(Lang.RememberMe)"
         boxHeight="0.75rem"
-        box-width="0.75rem"
+        boxWidth="0.75rem"
       />
       <BaseButton
         type="submit"
@@ -155,55 +155,20 @@ onMounted(async () => {
         width="100%"
         :disabled="isLoading"
         class="auth-popup__submit-btn"
-        :button-type="ButtonType.Blue"
+        :buttonType="ButtonType.Blue"
       >
         {{ _(Lang.LogIn) }} <Loader v-if="isLoading" name="AuthForm" />
       </BaseButton>
     </form>
-    <div class="forgot-password link" @click="() => open({ name: PopupType.RecoverPassword })">
+    <div
+      class="forgot-password link"
+      @click="
+        () => {
+          open({ name: PopupType.RecoverPassword, forceCloseAll: true });
+        }
+      "
+    >
       {{ _(Lang.ForgotPassword) }}
     </div>
   </div>
 </template>
-<style lang="scss">
-.auth-popup__checkbox {
-  .checkbox-container {
-    gap: rem(12px);
-  }
-  margin-bottom: rem(40px);
-  .input-checkbox {
-    padding: 0;
-    min-height: rem(12px);
-  }
-  .checkbox-label {
-    font-size: rem(14px) !important;
-    line-height: rem(14px) !important;
-  }
-}
-.auth-popup__submit-btn {
-  margin-bottom: rem(24px);
-  font-weight: 600;
-  font-size: rem(16px);
-  line-height: rem(18px);
-  &__points {
-    position: absolute;
-    padding-left: rem(4px);
-  }
-}
-.forgot-password {
-  font-weight: 600;
-  font-size: rem(14px);
-  line-height: rem(16px);
-  width: 100%;
-  text-align: center;
-}
-.auth-block {
-  margin-bottom: rem(24px);
-  &--green {
-    color: color(green);
-  }
-}
-.input-box__input {
-  width: 100%;
-}
-</style>

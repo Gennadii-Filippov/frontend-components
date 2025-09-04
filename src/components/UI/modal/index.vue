@@ -1,5 +1,5 @@
 <template>
-  <div ref="modal" v-if="isOpen" class="base-popup">
+  <div v-if="isOpen" class="base-popup">
     <Teleport to="body">
       <Transition name="fade">
         <div
@@ -68,7 +68,6 @@ import { calcPopupViewType } from '@/utils';
 import { PopupView } from '@/types/Popup';
 import { useDevice } from '@/composables/useDevice';
 const { isMobile } = useDevice();
-const modal = ref(null);
 const props = withDefaults(
   defineProps<{
     height?: string | number; // Высота модалки
