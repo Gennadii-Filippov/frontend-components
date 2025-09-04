@@ -76,6 +76,7 @@ const EmailFieldRules: ValidationRule[] = [
     message: _(Lang.TheEmailMustBeNoMoreThanSevTwoCharacters),
   },
 ];
+
 const reCaptchaComponent = shallowRef<ReturnType<typeof defineComponent> | null>(null);
 const locale = useConfig().get('locale') as Locales;
 const props = defineProps<{
@@ -145,8 +146,7 @@ if (localeIn([Locales.ES, Locales.GB, Locales.CZ, Locales.RS])) {
     rules: AgeLimitRules,
   });
 }
-const { form, setInFocusValue, errorsToShow, sendForm, validateField } = useFormWithValidation(fields);
-const loggingIn = ref(false);
+const { form, setInFocusValue, errorsToShow, sendForm, validateField, loading } = useFormWithValidation(fields);
 const send = async () => {
   await sendForm({
     beforeSend: async (formData) => {
@@ -166,7 +166,6 @@ const send = async () => {
     send: currentModal.value?.options?.sendFeedbackForm,
     afterSend: async (response) => {
       if (response.status === 'success') {
-        console.log(1);
         // popupStore.showPopupHard(PopupType.RegisterSuccess, {
         //   email: form.values['fos_user_registration_form[email]'] as string,
         // });
@@ -203,7 +202,7 @@ onMounted(async () => {
       :label="_(Lang.Email)"
       :type="InputType.Text"
       class="auth-popup__input"
-      :errors-form-with-validation="errorsToShow('fos_user_registration_form[email]')"
+      :errorsFormWithValidation="errorsToShow('fos_user_registration_form[email]')"
       @focus="setInFocusValue('fos_user_registration_form[email]', true)"
       @blur="
         setInFocusValue('fos_user_registration_form[email]', false);
@@ -217,7 +216,7 @@ onMounted(async () => {
       :type="InputType.Text"
       :autocomplete="'off'"
       class="auth-popup__input"
-      :errors-form-with-validation="errorsToShow('fos_user_registration_form[username]')"
+      :errorsFormWithValidation="errorsToShow('fos_user_registration_form[username]')"
       @focus="setInFocusValue('fos_user_registration_form[username]', true)"
       @blur="
         setInFocusValue('fos_user_registration_form[username]', false);
@@ -231,7 +230,7 @@ onMounted(async () => {
       :type="InputType.Password"
       :autocomplete="'new-password'"
       class="auth-popup__input"
-      :errors-form-with-validation="errorsToShow('fos_user_registration_form[plainPassword][first]')"
+      :errorsFormWithValidation="errorsToShow('fos_user_registration_form[plainPassword][first]')"
       @blur="
         setInFocusValue('fos_user_registration_form[plainPassword][first]', false);
         validateField('fos_user_registration_form[plainPassword][first]');
@@ -245,7 +244,7 @@ onMounted(async () => {
       :type="InputType.Password"
       :autocomplete="'new-password'"
       class="auth-popup__input"
-      :errors-form-with-validation="errorsToShow('fos_user_registration_form[plainPassword][second]')"
+      :errorsFormWithValidation="errorsToShow('fos_user_registration_form[plainPassword][second]')"
       @blur="
         setInFocusValue('fos_user_registration_form[plainPassword][second]', false);
         validateField('fos_user_registration_form[plainPassword][second]');
@@ -300,7 +299,7 @@ onMounted(async () => {
       width="100%"
       :buttonType="ButtonType.Blue"
       :class="['auth-popup__submit-btn', { 'mt-0 mb-3': props?.isLogin }]"
-      :disabled="loggingIn"
+      :disabled="loading"
     >
       {{ _(Lang.Register) }}
     </BaseButton>

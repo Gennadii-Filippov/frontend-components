@@ -14,11 +14,13 @@ import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
 import useRecaptcha from '@/composables/useRecaptcha';
 import { useConfig } from '@/composables/useConfig';
+import Loader from '../UI/Loader.vue';
 
 const { open, currentModal } = useModal({
   name: 'auth',
   closeOnDestroy: false,
 });
+
 const { init, renderBadge, executeRecaptcha } = await useRecaptcha(useConfig().get('locale'));
 
 const isSuccessLogIn = ref(false);
@@ -77,6 +79,7 @@ const { form, validateField, setInFocusValue, errorsToShow, sendForm } = useForm
 const send = async () => {
   await sendForm({
     beforeSend: async (formData) => {
+      isLoading.value = true;
       const token = await executeRecaptcha('login_check');
       if (!token) {
         return;
@@ -89,6 +92,7 @@ const send = async () => {
     afterSend: async (response) => {
       //TODO получать данные о пользователе и обновлять интерфейс
       console.log('response: ', response);
+      isLoading.value = false;
       if (response.status === 'success') {
         isSuccessLogIn.value = true;
         // TODO: авторизация
@@ -108,6 +112,7 @@ onMounted(async () => {
     <div v-if="isSuccessLogIn" class="pb-6 c-green error-text">
       {{ _(Lang.LoggingIn) }}
     </div>
+
     <form id="login-form" @submit.prevent="send">
       <div :class="['auth-block', messageClass]" v-if="socialErrorText">
         {{ socialErrorText }}
@@ -122,6 +127,7 @@ onMounted(async () => {
         :errorsFormWithValidation="errorsToShow('_username')"
         @blur="validateField('_username')"
         @focus="setInFocusValue('_username', false)"
+        :disabled="isLoading"
       />
       <BaseInput
         id="password"
@@ -133,6 +139,7 @@ onMounted(async () => {
         :errorsFormWithValidation="errorsToShow('_password')"
         @blur="validateField('_password')"
         @focus="setInFocusValue('_password', false)"
+        :disabled="isLoading"
       />
       <BaseCheckbox
         id="remember_me"
@@ -150,9 +157,7 @@ onMounted(async () => {
         class="auth-popup__submit-btn"
         :button-type="ButtonType.Blue"
       >
-        {{ _(Lang.LogIn) }}
-        <!--        Это заготовка для нового дизайна-->
-        <!--        <span class="auth-popup__submit-btn__points" v-if="loggingIn">{{ points }}</span>-->
+        {{ _(Lang.LogIn) }} <Loader v-if="isLoading" name="AuthForm" />
       </BaseButton>
     </form>
     <div class="forgot-password link" @click="() => open({ name: PopupType.RecoverPassword })">

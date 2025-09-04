@@ -45,7 +45,6 @@ import RegistrationForm from './RegistrationForm.vue';
 import { Tabs } from './types';
 import { onMounted, ref } from 'vue';
 import { PopupParams, PopupType } from '@/types/Popup';
-import ModalLoader from '@/components/UI/modal/PopupLoader.vue';
 import { WebEvent } from '@/types/WebEvent';
 import { calcPopupViewType } from '@/utils';
 import { inject } from 'vue';

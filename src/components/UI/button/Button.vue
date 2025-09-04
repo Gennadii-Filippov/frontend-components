@@ -1,5 +1,9 @@
 <template>
-  <button :class="['base-button', 'base-button--' + buttonType]" :style="buttonStyles">
+  <button
+    :class="['base-button', 'base-button--' + buttonType, { 'base-button--disabled': disabled }]"
+    :style="buttonStyles"
+    :disabled="disabled"
+  >
     <slot />
   </button>
 </template>
@@ -13,10 +17,12 @@ const props = withDefaults(
     height?: string | number;
     width?: string | number;
     buttonType: ButtonType;
+    disabled?: boolean;
   }>(),
   {
     height: 'auto',
     width: 'auto',
+    disabled: false,
   }
 );
 const buttonStyles = computed(() => ({

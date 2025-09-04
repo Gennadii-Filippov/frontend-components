@@ -1,17 +1,8 @@
 <template>
-  <Modal
-    ref="basePopupRef"
-    :width="536"
-    :headerBorderBottom="false"
-    :viewType="PopupView.DinamicHeight"
-    :withoutHeader="true"
-  >
+  <Modal ref="basePopupRef" :width="536" :headerBorderBottom="false" :viewType="PopupView.DinamicHeight" withoutHeader>
     <template #content>
       <div class="register-success">
-        <!--{# <div
-          class="register-success__close-btn icon icon-cross"
-          @click="close"
-        ></div> #}-->
+        <div class="register-success__close-btn icon icon-cross" @click="() => close()"></div>
         <div class="block-section block-section-center">
           <i class="icon icon-check"></i>
           <p class="resetting__subtitle">{{ _(Lang.SuccessRegister) }}</p>

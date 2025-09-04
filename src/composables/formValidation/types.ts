@@ -1,3 +1,5 @@
+import type { Ref } from 'vue';
+
 export enum ValidationRules {
   Required = 'required',
   MinLength = 'minLength',
@@ -13,6 +15,7 @@ export enum ValidationRules {
   isPhone = 'isPhone',
   isAnyFilled = 'isAnyFilled',
   isLatinDigitsDot = 'isLatinDigitsDot',
+  isEmailHard = 'isEmailHard',
 }
 
 export type ValidationRule =
@@ -22,9 +25,23 @@ export type ValidationRule =
   | { type: ValidationRules.isEmail; message: string }
   | { type: ValidationRules.isNumeric; message: string }
   | { type: ValidationRules.isPositiveNumeric; message: string }
-  | { type: ValidationRules.isMinMaxDate; minDate: string; maxDate: string; message: string }
-  | { type: ValidationRules.isLessThanDate; borderDate: string; message: string }
-  | { type: ValidationRules.isMoreThanDate; borderDate: string; message: string }
+  | { type: ValidationRules.isEmailHard; message: string }
+  | {
+      type: ValidationRules.isMinMaxDate;
+      minDate: string;
+      maxDate: string;
+      message: string;
+    }
+  | {
+      type: ValidationRules.isLessThanDate;
+      borderDate: string;
+      message: string;
+    }
+  | {
+      type: ValidationRules.isMoreThanDate;
+      borderDate: string;
+      message: string;
+    }
   | { type: ValidationRules.isValidDate; message: string }
   | { type: ValidationRules.isOnlyLetters; message: string }
   | { type: ValidationRules.isPhone; message: string }
@@ -38,6 +55,7 @@ export type FieldConfig<T> = {
   //в каком поле по умолчанию выводить серверную ошибку
   defaultServerError?: boolean;
 };
+
 export type ServerErrors = {
   error?: string;
   status?: string;
@@ -46,7 +64,9 @@ export type ServerErrors = {
   success: boolean;
   field?: string;
 };
+
 export interface UseFormWithValidation<T extends Record<string, any>> {
+  loading: Ref<boolean>;
   form: {
     values: Record<keyof T, string | boolean>; // Reactive values state
     errors: Record<keyof T, string[]>; // Reactive errors state

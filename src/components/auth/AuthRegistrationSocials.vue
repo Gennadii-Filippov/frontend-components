@@ -24,7 +24,7 @@ import { IconNames } from '@/components/UI/icon/iconNames';
 import { localeIn, localeNotIn } from './checkLocale';
 import { ref, computed, onMounted } from 'vue';
 import { SocialIcon } from './types';
-import { PopupParams, PopupType } from '@/types/Popup';
+import { PopupType } from '@/types/Popup';
 import useModal from '@/composables/useModal';
 const { currentModal, open, close, closeAll } = useModal({
   name: 'auth',
@@ -32,8 +32,6 @@ const { currentModal, open, close, closeAll } = useModal({
 });
 
 import { WebEvent } from '@/types/WebEvent';
-
-// const params = currentModal.value?.params as PopupParams[PopupType.Auth];
 
 const icons = ref<SocialIcon[]>([
   {
@@ -132,15 +130,12 @@ onMounted(() => {
     }
 
     if (event.data && !event.data.from_auth) {
-      // close('auth');
+      close('auth');
       return;
     }
 
-    // windowAuth.close();
-
     if (event.data) {
-      // closeAll();
-      // close('auth');
+      closeAll();
       event.data.popupType = PopupType.SocialMediaRegister;
       open({ name: PopupType.SocialMediaRegister, options: event.data });
     }
@@ -161,7 +156,6 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-// @use '@assets/sass/settings' as *;
 .social-auth-link {
   display: block;
   cursor: pointer;

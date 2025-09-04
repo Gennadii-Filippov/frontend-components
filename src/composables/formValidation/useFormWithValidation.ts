@@ -10,9 +10,9 @@ import {
   isPositiveNumeric,
   isValidDate,
 } from './utils';
-import type { FieldConfig, ServerErrors, UseFormWithValidation } from './types';
+import type { FieldConfig, UseFormWithValidation } from './types';
 import { ValidationRules } from './types';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
 
 export function useFormWithValidation<T extends Record<string, any>>(
   fields: FieldConfig<T>[]
@@ -29,6 +29,8 @@ export function useFormWithValidation<T extends Record<string, any>>(
     isInFocus: Record<keyof T, boolean>;
     errorForm: boolean;
   };
+
+  const loading = ref<boolean>(false);
 
   fields.forEach(({ name, value }) => {
     form.values[name] = value;
@@ -169,6 +171,7 @@ export function useFormWithValidation<T extends Record<string, any>>(
     if (!validateForm()) {
       return {};
     }
+    loading.value = true;
 
     const { beforeSend, send, afterSend } = params;
 
@@ -178,11 +181,9 @@ export function useFormWithValidation<T extends Record<string, any>>(
     });
 
     await beforeSend?.(formData);
-
     const data = await send(formData);
-
     await afterSend?.(data, formData);
-
+    loading.value = false;
     return data;
   }
 
@@ -194,5 +195,6 @@ export function useFormWithValidation<T extends Record<string, any>>(
     errorsToShow,
     sendForm,
     showServerErrors,
+    loading,
   };
 }

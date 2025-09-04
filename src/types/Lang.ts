@@ -409,4 +409,5 @@ export enum Lang {
   ShowMore = 'Show more',
   UnknownErrorPleaseTryAgainLater = 'Unknown error. Please, try again later',
   OnlyAuthorizedUsersAreAllowedToVote2 = 'Only authorized users are allowed to vote (2)',
+  EmailResettingButton = 'Reset password',
 }

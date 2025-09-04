@@ -9,6 +9,7 @@ import { Modal, useFormWithValidation } from '@/index';
 import useModal from '@/composables/useModal';
 import useGlobal from '@/composables/useGlobal';
 import { ValidationRules } from '@/composables/formValidation/types';
+import { PopupView } from '@/types/Popup';
 
 const loading = ref(false);
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
@@ -59,12 +60,7 @@ const send = async () => {
 <template>
   <div>
     <PopupLoader v-if="loading" name="RecoveryPassport" />
-    <Modal
-      :name="PopupType.RecoverPassword"
-      v-else-if="!loading && popupType == PopupState.Request"
-      :width="375"
-      className="reset-passport--popup"
-    >
+    <Modal :name="PopupType.RecoverPassword" v-else-if="!loading && popupType == PopupState.Request" :width="375">
       <template #title>
         <div class="reset-password-popup__title">
           {{ _(Lang.ResetPassword) }}
@@ -80,21 +76,19 @@ const send = async () => {
                   <p class="password-note__txt" v-html="_(Lang.ResetPassportLink)"></p>
                 </div>
               </div>
-              <div class="input-box">
-                <BaseInput
-                  id="email"
-                  v-model="form.values._email"
-                  :label="_(Lang.Email)"
-                  name="username"
-                  :errors-form-with-validation="errorsToShow('_email')"
-                  @blur="validateField('_email')"
-                  @focus="setInFocusValue('_email', false)"
-                />
-              </div>
+              <BaseInput
+                id="email"
+                v-model="form.values._email"
+                :label="_(Lang.Email)"
+                name="username"
+                :errors-form-with-validation="errorsToShow('_email')"
+                @blur="validateField('_email')"
+                @focus="setInFocusValue('_email', false)"
+              />
             </div>
             <div class="reset-password-popup__button-container">
-              <BaseButton class="button blue" type="submit" :value="_(Lang.ResetPassport)" />
-              <BaseButton class="link" @click="close" :value="_(Lang.Cancel)" />
+              <BaseButton class="button blue" type="submit" :value="_(Lang.EmailResettingButton)" />
+              <BaseButton class="button-close" @click="close" :value="_(Lang.Cancel)" />
             </div>
           </div>
         </form>
@@ -102,19 +96,20 @@ const send = async () => {
     </Modal>
     <Modal
       v-else-if="!loading && popupType == PopupState.Success"
-      :width="560"
+      :width="536"
       :headerBorderBottom="false"
-      className="reset-passport--popup"
+      withoutHeader
+      :viewType="PopupView.DinamicHeight"
     >
       <template #content>
-        <div class="reset-password-popup">
+        <div class="reset-password-popup reset-password-popup--email-sended">
           <div class="block-section block-section-center desctop-no-padding-y block-section-send">
             <i class="icon icon-check"></i>
             <p class="resetting__subtitle">
               {{ _(Lang.ResetPassportEmailSended) }}
             </p>
             <div>
-              <p class="block-section__txt block-section__txt--desctop">
+              <p class="block-section__txt">
                 <span v-html="message"></span>
               </p>
             </div>
@@ -142,8 +137,8 @@ const send = async () => {
   width: 100% !important;
   &__button-container {
     display: flex;
-    gap: 16px;
-    padding-top: 16px;
+    gap: rem(16px);
+    padding-top: rem(16px);
   }
 }
 .icon {
@@ -177,8 +172,8 @@ const send = async () => {
   }
   &__txt {
     font-weight: 400;
-    font-size: rem(14px);
-    line-height: rem(20px);
+    font-size: rem(18px);
+    line-height: rem(24px);
   }
 }
 .link {
@@ -197,6 +192,201 @@ const send = async () => {
 .link {
   border-radius: $block-br !important;
   padding: rem(15px) rem(10px);
+}
+.block-section.footer {
+  gap: 1rem;
+}
+.reset-password-popup,
+.social-password-required {
+  background: white;
+  width: rem(375px);
+  &:has(.icon-check) {
+    width: rem(560px);
+    @media (max-width: 743px) {
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  @media (max-width: 743px) {
+    width: 100%;
+  }
+  .header {
+    font-weight: 600;
+    height: rem(48px);
+    @media (min-width: 744px) {
+      height: rem(64px);
+    }
+  }
+  &__title {
+    font-weight: 700;
+    color: color(black-80-hex);
+    display: flex;
+    height: 100%;
+    align-items: center;
+    font-size: rem(14px);
+    line-height: rem(16px);
+    @media ($md) {
+      font-weight: 600;
+      font-size: rem(16px);
+      line-height: rem(18px);
+    }
+  }
+  .light-background {
+    line-height: 1.25rem;
+  }
+  .footer {
+    display: flex;
+    align-items: center;
+  }
+  .link {
+    margin-left: auto;
+  }
+  .block-section__border-blue {
+    padding: rem(16px);
+    display: flex;
+    gap: rem(12px);
+    border-radius: rem(8px);
+    border: 1px solid color(blue);
+    .icon-circle-e {
+      height: rem(24px);
+      width: rem(24px);
+      &::before {
+        font-size: rem(24px);
+        color: color(blue);
+      }
+    }
+  }
+  .block-section__txt {
+    font-weight: 400;
+    font-size: rem(14px);
+    line-height: rem(20px);
+    @media (min-width: 744px) {
+      &.block-section__txt--desctop {
+        font-size: rem(18px);
+        line-height: rem(24px);
+      }
+    }
+  }
+
+  .block-section {
+    padding: 1.5rem 1rem;
+    border: none !important ;
+    &--avatar {
+      display: flex;
+      padding-top: rem(16px);
+      padding-bottom: rem(16px);
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: rem(24px);
+      margin-bottom: rem(12px);
+      .image {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 50%;
+        background-image: linear-gradient(135deg, #3023ae, #c86dd7);
+        text-align: center;
+        color: color(white);
+        font-size: 1.875rem;
+        font-weight: 600;
+        overflow: visible;
+      }
+    }
+    &.header {
+      padding: 1rem;
+    }
+    &.border-none {
+      border: none !important;
+    }
+    &.no-padding-y {
+      padding-bottom: 0;
+      padding-top: 0;
+    }
+    &.block-section-send {
+      padding-top: rem(71px);
+      padding-bottom: rem(71px);
+    }
+    &.desctop-no-padding-y {
+      @media screen and (min-width: 744px) {
+        padding-bottom: 0;
+        padding-top: 0;
+      }
+    }
+    &-center {
+      display: flex;
+      flex-direction: column;
+
+      .block-section__txt {
+        font-size: rem(14px);
+        line-height: rem(20px);
+        text-align: center;
+
+        @media (min-width: 744px) {
+          font-size: rem(18px);
+          line-height: rem(24px);
+        }
+      }
+      .block-section__span {
+        font-weight: 700;
+      }
+    }
+    .resetting__subtitle {
+      font-size: rem(18px);
+      font-weight: 700;
+      line-height: rem(24px);
+      text-align: center;
+      margin-bottom: rem(15px);
+      @media (min-width: 744px) {
+        margin-bottom: rem(16px);
+      }
+    }
+    .icon-check {
+      height: rem(72px);
+      display: block;
+      width: rem(72px);
+      padding: 0;
+      margin: 0 auto rem(15px);
+      &::before {
+        font-size: rem(72px);
+        width: 100%;
+        height: 100%;
+        color: color(green);
+      }
+      @media (min-width: 744px) {
+        margin: 0 auto rem(20px);
+      }
+    }
+  }
+  .footer {
+    .button {
+      height: rem(48px);
+      font-size: rem(16px);
+      line-height: rem(18px);
+      width: 100%;
+      border-radius: rem(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: rem(15px) rem(10px);
+      &.js-resetting-back-link {
+        width: 100%;
+      }
+    }
+    .link {
+      height: rem(48px);
+      width: 100%;
+      padding: rem(9px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid color(blue-30);
+      border-radius: $block-br;
+      color: color(black-80);
+    }
+  }
 }
 </style>
 <style lang="scss">

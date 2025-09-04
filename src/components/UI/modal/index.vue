@@ -1,10 +1,14 @@
 <template>
-  <div ref="modal" v-if="isOpen" :class="{ 'lb-popup-background': true, shadow: props.shadow }">
+  <div ref="modal" v-if="isOpen" class="base-popup">
     <Teleport to="body">
       <Transition name="fade">
         <div
           ref="popupWrapper"
-          :class="['base-popup__wrap', { 'base-popup__wrap--mobile': isMobileType }]"
+          :class="[
+            'base-popup__wrap',
+            { 'base-popup__wrap--mobile': isMobileType },
+            { 'base-popup__wrap--shadow': hasShadow },
+          ]"
           @mousedown.self="closePopupEvent"
         >
           <div
@@ -18,17 +22,25 @@
             ]"
             ref="popupInner"
             :style="popupInnerStyles"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="ariaLabelledbyId"
+            :aria-describedby="ariaDescribedbyId"
           >
-            <div
-              ref="popupHeader"
-              :class="['base-popup__header', { 'border-bottom-active': headerBorderBottom }]"
-              :style="popupHeaderStyles"
-            >
-              <div class="base-popup__header-inner">
-                <slot name="title" />
-                <div class="base-popup__close-btn icon icon-cross" @click="closePopupEvent"></div>
+            <slot name="header">
+              <div
+                ref="popupHeader"
+                :class="['base-popup__header', { 'border-bottom-active': headerBorderBottom }]"
+                :style="popupHeaderStyles"
+              >
+                <div class="base-popup__header-inner">
+                  <slot name="title" />
+                  <slot name="close" :close="closePopupEvent">
+                    <div class="base-popup__close-btn icon icon-cross" @click="closePopupEvent"></div>
+                  </slot>
+                </div>
               </div>
-            </div>
+            </slot>
             <div
               ref="popupContent"
               :class="['base-popup__content', { 'base-popup__content--mobile': isMobileType }]"
@@ -48,7 +60,7 @@
 
 <script setup lang="ts">
 import useModal from '@/composables/useModal';
-import { computed, onBeforeUnmount, onMounted, ref, Transition } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, Transition, toRefs } from 'vue';
 import PerfectScrollbar from 'perfect-scrollbar';
 import { ScreenSize } from '@/types/ScreenSize';
 import { WebEvent } from '@/types/WebEvent';
@@ -77,6 +89,10 @@ const props = withDefaults(
       left: string;
     };
     heightHeader?: string;
+    ariaLabelledby?: string;
+    ariaDescribedby?: string;
+    offsetSelector?: string; // CSS selector to measure offset element height
+    offsetPx?: number; // Explicit offset in px (takes precedence)
   }>(),
   {
     width: 'auto',
@@ -87,6 +103,11 @@ const props = withDefaults(
     shadow: true,
   }
 );
+// expose selected props and computed wrappers for template binding
+const { shadow, ariaLabelledby, ariaDescribedby } = toRefs(props);
+const hasShadow = computed(() => !!shadow.value);
+const ariaLabelledbyId = computed(() => ariaLabelledby.value);
+const ariaDescribedbyId = computed(() => ariaDescribedby.value);
 const viewType = ref(props.viewType);
 
 const { isOpen, close, styles } = useModal({
@@ -136,19 +157,32 @@ const popupHeader = ref<HTMLElement | null>(null);
 const popupFooter = ref<HTMLElement | null>(null);
 const popupContent = ref<HTMLElement | null>(null);
 const popupInner = ref<HTMLElement | null>(null);
+// PS instance to prevent multiple initializations
+const psInstance = ref<PerfectScrollbar | null>(null);
 //Нужна для предотвращения скролла боди
 let scrollDistance = 0;
 
-const handleResize = () => {
-  viewType.value = calcPopupViewType();
+// rAF debounced resize handler
+let resizeRaf = 0;
+const onResize = () => {
+  if (resizeRaf) cancelAnimationFrame(resizeRaf);
+  resizeRaf = requestAnimationFrame(() => {
+    // Обновляем тип представления при необходимости
+    viewType.value = calcPopupViewType();
+    // Высота и внутренние элементы
+    setPopupInnerHeight();
+    setUpPopupElements();
+  });
 };
 
 onMounted(() => {
   scrollDistance = window.scrollY;
   // Устанавливаем высоту модалки
   setPopupInnerHeight();
+  // Подключаем дебаунс-обработчики ресайза
+  window.addEventListener(WebEvent.Resize, onResize);
   if (window.visualViewport) {
-    window.visualViewport.onresize = setPopupInnerHeight;
+    window.visualViewport.addEventListener('resize', onResize);
   }
   //Предотвращаем скролл body
   if (props.isMobileType && isMobile.value) {
@@ -156,15 +190,10 @@ onMounted(() => {
     document.body.style.top = `-${scrollDistance}px`;
     document.body.classList.add('base-popup-in');
     document.body.style.paddingRight = `${window?.innerWidth - document.documentElement.clientWidth}px`;
-    if (props?.viewType === PopupView.DinamicHeight) {
-      handleResize();
-      window.addEventListener(WebEvent.Resize, handleResize);
-    }
+    // На мобильных также используем общий обработчик
   }
 
   setUpPopupElements();
-
-  window.addEventListener(WebEvent.Resize, setUpPopupElements);
 });
 
 onBeforeUnmount(() => {
@@ -176,15 +205,15 @@ onBeforeUnmount(() => {
     document.documentElement.style.scrollBehavior = '';
     scrollTo({ top: scrollDistance });
   }
-
-  window.removeEventListener(WebEvent.Resize, setUpPopupElements);
-
+  // Снимаем обработчики ресайза
+  window.removeEventListener(WebEvent.Resize, onResize);
   if (window.visualViewport) {
-    window.visualViewport.onresize = null;
+    window.visualViewport.removeEventListener('resize', onResize);
   }
-
-  if (props?.viewType === PopupView.DinamicHeight) {
-    window.removeEventListener(WebEvent.Resize, handleResize);
+  // Чистим PerfectScrollbar
+  if (psInstance.value) {
+    psInstance.value.destroy();
+    psInstance.value = null;
   }
 });
 
@@ -233,8 +262,15 @@ function setPopupInnerHeight() {
       popupInner.value?.style.setProperty('--height', '100dvh');
       break;
     case PopupView.FullHeightWithoutHeader:
-      const siteHeader = document.querySelector('.site-header');
-      popupInner.value?.style.setProperty('--height', `calc(100dvh - ${siteHeader?.scrollHeight ?? 0}px)`);
+      // Вычисляем отступ на основе пропов
+      let offset = 0;
+      if (typeof props.offsetPx === 'number') {
+        offset = props.offsetPx;
+      } else if (props.offsetSelector) {
+        const el = document.querySelector(props.offsetSelector) as HTMLElement | null;
+        offset = el?.scrollHeight ?? 0;
+      }
+      popupInner.value?.style.setProperty('--height', `calc(100dvh - ${offset}px)`);
       break;
     case PopupView.Auto:
       popupInner.value?.style.setProperty('--height', 'auto');
@@ -265,12 +301,16 @@ async function setUpPopupElements() {
 
     popupContent.value.style.setProperty('--content-height', `calc(100% - ${headerHeight + footerHeight}px)`);
 
-    if (props.usePerfectScrollbar) {
-      new PerfectScrollbar(popupContent.value, {
-        wheelPropagation: false,
-        scrollXMarginOffset: 1,
-        scrollYMarginOffset: 1,
-      });
+    if (props.usePerfectScrollbar && popupContent.value) {
+      if (psInstance.value) {
+        psInstance.value.update();
+      } else {
+        psInstance.value = new PerfectScrollbar(popupContent.value, {
+          wheelPropagation: false,
+          scrollXMarginOffset: 1,
+          scrollYMarginOffset: 1,
+        });
+      }
     }
   } catch (error) {
     console.error('Error in setUpPopupElements:', error);
@@ -300,6 +340,11 @@ defineExpose({
     justify-content: center;
     align-items: center;
     z-index: 9999999;
+    // Если тень отключена, убираем фон и блюр
+    &:not(&--shadow) {
+      backdrop-filter: none;
+      background-color: transparent;
+    }
     &--mobile {
       bottom: 0;
       @media #{$md_max} {
