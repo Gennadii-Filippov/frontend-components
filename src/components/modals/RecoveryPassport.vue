@@ -106,6 +106,7 @@ const send = async () => {
       :headerBorderBottom="false"
       withoutHeader
       :viewType="PopupView.DinamicHeight"
+      name="RecoveryPassportSuccess"
     >
       <template #content>
         <div class="reset-password-popup reset-password-popup--email-sended">

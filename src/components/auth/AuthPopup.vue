@@ -42,9 +42,9 @@
           :addErrorText="addErrorText"
           :note="note"
         />
-        <AuthForm v-if="activeTab == Tabs.Auth" :messageClass="messageClass" :socialErrorText="socialErrorText" />
+        <AuthForm v-show="activeTab == Tabs.Auth" :messageClass="messageClass" :socialErrorText="socialErrorText" />
         <RegistrationForm
-          v-else
+          v-show="activeTab == Tabs.Registration"
           :isLogin="params?.isLogin"
           :messageClass="messageClass"
           :socialErrorText="socialErrorText"
@@ -67,7 +67,7 @@ import { TRANSLATION_KEY } from '@/types/injection-keys';
 import { useModal, Modal } from '@/index';
 import { PopupView } from '@/types/Popup';
 
-const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
+const { currentModal } = useModal({ name: 'auth' });
 
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 

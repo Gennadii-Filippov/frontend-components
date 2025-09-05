@@ -26,9 +26,8 @@ import { ref, computed, onMounted } from 'vue';
 import { SocialIcon } from './types';
 import { PopupType } from '@/types/Popup';
 import useModal from '@/composables/useModal';
-const { currentModal, open, close, closeAll } = useModal({
+const { open, close, closeAll } = useModal({
   name: 'auth',
-  closeOnDestroy: false,
 });
 
 import { WebEvent } from '@/types/WebEvent';
@@ -135,7 +134,7 @@ onMounted(() => {
     }
 
     if (event.data) {
-      closeAll();
+      // closeAll();
       event.data.popupType = PopupType.SocialMediaRegister;
       open({ name: PopupType.SocialMediaRegister, options: event.data });
     }

@@ -34,7 +34,6 @@ const _ = inject(TRANSLATION_KEY, (key: string) => key);
 import useModal from '@/composables/useModal';
 const { open } = useModal({
   name: 'auth',
-  closeOnDestroy: false,
 });
 
 const handleLoginClick = (event: MouseEvent) => {

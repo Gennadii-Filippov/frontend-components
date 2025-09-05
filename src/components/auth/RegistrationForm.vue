@@ -17,7 +17,7 @@ import useRecaptcha from '@/composables/useRecaptcha';
 import { useConfig } from '@/composables/useConfig';
 import { ButtonType } from '@/components/UI/button/ButtonTypes';
 import useModal from '@/composables/useModal';
-const { currentModal } = useModal({ name: 'auth', closeOnDestroy: false });
+const { currentModal } = useModal({ name: 'auth' });
 import { ValidationRule, ValidationRules } from '@/composables/formValidation/types';
 const _ = inject(TRANSLATION_KEY, (key: string) => key);
 const recaptchaBadge = ref<HTMLElement | null>(null);

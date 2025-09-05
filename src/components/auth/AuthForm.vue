@@ -11,7 +11,6 @@ import Loader from '../UI/Loader.vue';
 
 const { open, currentModal, close } = useModal({
   name: 'auth',
-  closeOnDestroy: false,
 });
 
 const { init, renderBadge, executeRecaptcha } = await useRecaptcha(useConfig().get('locale'));
@@ -99,13 +98,6 @@ onMounted(async () => {
     await init(() => renderBadge(recaptchaBadge.value as HTMLElement, 'login_check'));
   }
 });
-
-const openRecoveryPassword = () => {
-  open({ name: PopupType.RecoverPassword });
-  setTimeout(() => {
-    close();
-  }, 100);
-};
 </script>
 <template>
   <div>
