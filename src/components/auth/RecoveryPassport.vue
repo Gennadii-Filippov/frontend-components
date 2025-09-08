@@ -86,7 +86,7 @@ const send = async () => {
             </div>
             <div class="reset-password-popup__button-container">
               <BaseButton class="button blue" type="submit" :buttonType="ButtonType.Blue">
-                {{ _(Lang.EmailResettingButton) }}
+                {{ _(Lang.ResetPassport) }}
               </BaseButton>
               <BaseButton
                 class="button-close"
@@ -102,9 +102,8 @@ const send = async () => {
     </Modal>
     <Modal
       v-else-if="!loading && popupType == PopupState.Success"
-      :width="536"
+      :width="560"
       :headerBorderBottom="false"
-      withoutHeader
       :viewType="PopupView.DinamicHeight"
       name="RecoveryPassportSuccess"
     >

@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { BaseButton, ButtonType } from '@/index';
-import RecoveryPassport from '@/components/modals/RecoveryPassport.vue';
+import RecoveryPassport from '@/components/auth/RecoveryPassport.vue';
 import AuthPopup from '@/components/auth/AuthPopup.vue';
 import useModal from '@/composables/useModal';
 const { open, modalsList } = useModal({ name: 'auth' });
